@@ -11,29 +11,17 @@ export const onPost = async (event: RequestEvent) => {
     console.log(game);
 
     const mySnakeIndex = game.board.snakes.findIndex(snake => snake.id === game.you.id);
+    const nonDeathMoves = [];
+    for (const move of ["left", "right", "up", "down"] as const) {
+        const scenario = JSON.parse(JSON.stringify(game.board));
+        moveSnake(scenario.snakes[mySnakeIndex], move);
+        const statuses = resolveBoardAndGetSnakeStatuses(scenario);
+        if (statuses[game.you.id].alive === true) {
+            nonDeathMoves.push(move);
+        }
+    }
 
-    const leftScenario = JSON.parse(JSON.stringify(game.board));
-    const rightScenario = JSON.parse(JSON.stringify(game.board));
-    const upScenario = JSON.parse(JSON.stringify(game.board));
-    const downScenario = JSON.parse(JSON.stringify(game.board));
-
-    moveSnake(leftScenario.snakes[mySnakeIndex], "left");
-    moveSnake(rightScenario.snakes[mySnakeIndex], "right");
-    moveSnake(upScenario.snakes[mySnakeIndex], "up");
-    moveSnake(downScenario.snakes[mySnakeIndex], "down");
-
-    const leftStatuses = resolveBoardAndGetSnakeStatuses(leftScenario);
-    const rightStatuses = resolveBoardAndGetSnakeStatuses(rightScenario);
-    const upStatuses = resolveBoardAndGetSnakeStatuses(upScenario);
-    const downStatuses = resolveBoardAndGetSnakeStatuses(downScenario);
-
-    console.log({ 
-        leftStatuses,
-        rightStatuses,
-        upStatuses,
-        downStatuses
-        
-    })
+    console.log(nonDeathMoves)
 
     event.headers.set("Content-Type", "application/json");
     event.send(new Response(JSON.stringify({
