@@ -15,7 +15,7 @@ export function moveSnake(snake: Snake, direction: "up" | "down" | "left" | "rig
             newHead = { x: head.x + 1, y: head.y };
             break;
     }
-    
+
     const length = snake.body.length;
     const hasStackedTail = snake.body[length - 1].x === snake.body[length - 2].x && snake.body[length - 1].y === snake.body[length - 2].y;
     const newSnakeBody: Snake["body"] = [newHead];
@@ -38,7 +38,10 @@ export function resolveBoardAndGetSnakeStatuses(board: GameBoard) {
             snakeStatuses[id] = { alive: false };
             return;
         }
-
+        if (ateOwnNeck(snake)) {
+            snakeStatuses[id] = { alive: false };
+            return;
+        }
         snakeStatuses[id] = { alive: true };
         for (let i = 0; i < board.snakes.length; i++) {
             const otherSnake = board.snakes[i];
@@ -56,6 +59,10 @@ export function resolveBoardAndGetSnakeStatuses(board: GameBoard) {
         if (snake.health <= 0) { snakeStatuses[id].alive = false }
     });
     return snakeStatuses
+}
+
+export function ateOwnNeck(snake: Snake) {
+    return snake.body[0].x === snake.body[1].x && snake.body[0].y === snake.body[1].y
 }
 
 export function landedOnFood(snake: Snake, board: GameBoard) {

@@ -8,7 +8,7 @@ export const onPost = async (event: RequestEvent) => {
         board: GameBoard,
         you: Snake
     } = await event.request.json();
-    console.log(game);
+    console.log(game.board);
 
     const mySnakeIndex = game.board.snakes.findIndex(snake => snake.id === game.you.id);
     const nonDeathMoves = [];
