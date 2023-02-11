@@ -11,12 +11,3 @@ export const onGet = async (event: RequestEvent) => {
     }
     event.send(new Response(JSON.stringify(config)));
 }
-
-export const onPost = async (event: RequestEvent) => {
-
-    event.send(new Response(JSON.stringify({ 
-        move: "up",
-        shout: "AHHHHHHHH I'M A SNAKE"
-    })))
-}
-
