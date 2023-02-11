@@ -37,8 +37,8 @@ export function resolveBoardAndGetSnakeStatuses(board: GameBoard) {
         if (isOutOfBounds(snake, board)) {
             snakeStatuses[id] = { alive: false };
             return;
-        }
-        if (ateOwnNeck(snake)) {
+        } 
+        if (isCollidedWithSelf(snake)) {
             snakeStatuses[id] = { alive: false };
             return;
         }
@@ -61,10 +61,6 @@ export function resolveBoardAndGetSnakeStatuses(board: GameBoard) {
     return snakeStatuses
 }
 
-export function ateOwnNeck(snake: Snake) {
-    return snake.body[0].x === snake.body[1].x && snake.body[0].y === snake.body[1].y
-}
-
 export function landedOnFood(snake: Snake, board: GameBoard) {
     const { x, y } = snake.body[0];
     const foodIndex = board.food.findIndex((food) => food.x === x && food.y === y);
@@ -75,6 +71,15 @@ export function isOutOfBounds(snake: Snake, board: GameBoard) {
     // console.log({ body: snake.body, height: board.height, width: board.width })
     const { x, y } = snake.body[0];
     return x < 0 || x >= board.width || y < 0 || y >= board.height
+}
+
+export function isCollidedWithSelf(snake: Snake) { 
+    const { x, y } = snake.body[0];
+    for (let i = 1; i < snake.body.length; i++) {
+        const bodyPart = snake.body[i];
+        if (x === bodyPart.x && y === bodyPart.y) { return true }
+    }
+    return false;
 }
 
 export function processCollisionCheck(snake: Snake, otherSnake: Snake) {
