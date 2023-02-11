@@ -21,11 +21,12 @@ export const onPost = async (event: RequestEvent) => {
         }
     }
 
-    console.log(nonDeathMoves)
+    console.log(nonDeathMoves);
+    const chosenMove = nonDeathMoves[Math.floor(Math.random() * nonDeathMoves.length)];
 
     event.headers.set("Content-Type", "application/json");
     event.send(new Response(JSON.stringify({
-        move: "up",
+        move: chosenMove,
         shout: "AHHHHHHHH I'M A SNAKE"
     })))
 }
