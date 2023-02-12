@@ -12,7 +12,7 @@ export const onPost = async (event: RequestEvent) => {
 
     //in future will trim board first for performance, but fine for now
     const outcomes = getMoveOutcomes(game.board);
-    console.log({ outcomes });
+
     const nonDeathMoves = outcomes.filter(outcome => outcome.statuses[game.you.id].alive).map(outcome => {
         return outcome.gameBoard.snakes.find(snake => snake.id === game.you.id)!.lastMoved
     })
