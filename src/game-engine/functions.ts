@@ -1,4 +1,4 @@
-export function moveSnake(snake: Snake, direction: "up" | "down" | "left" | "right") {
+export function moveSnake(snake: TrimmedSnake, direction: "up" | "down" | "left" | "right") {
     const head = snake.body[0];
     let newHead: Snake["body"][number];
     switch (direction) {
@@ -25,6 +25,7 @@ export function moveSnake(snake: Snake, direction: "up" | "down" | "left" | "rig
     }
     if (hasStackedTail) { newSnakeBody.push(snake.body[length - 1]); }
     snake.body = newSnakeBody;
+    (snake as TrimmedSnake & { lastMoved: Direction }).lastMoved = direction;
 }
 
 export function getBackwardsDirection(snake: TrimmedSnake) {
@@ -135,13 +136,23 @@ export function getMoveOutcomes(trimmedBoard: {
     hazards: GameBoard["hazards"];
     snakes: Array<TrimmedSnake>
 }) {
-    const { width, height, food, hazards, snakes } = trimmedBoard;
-
-    const reasonableDirections = getReasonableDirections(snakes);
+    const reasonableDirections = getReasonableDirections(trimmedBoard.snakes);
     const moveCommands = getMoveCommands(reasonableDirections);
+    const outcomes: Array<{ gameBoard: typeof trimmedBoard, statuses: ReturnType<typeof resolveBoardAndGetSnakeStatuses> }> = [];
+    moveCommands.forEach((command) => {
+        const scenario = JSON.parse(JSON.stringify(trimmedBoard)) as typeof trimmedBoard;
+        scenario.snakes.forEach((snake) => {
+            const direction = command[snake.id];
+            moveSnake(snake, direction);
+        });
+        const snakeStatuses = resolveBoardAndGetSnakeStatuses(scenario as GameBoard);
+        outcomes.push({ gameBoard: scenario, statuses: snakeStatuses })
+    })
 
-    const outcomes = [];
-    return outcomes;
+    return outcomes as {
+        gameBoard: Omit<typeof trimmedBoard, "snakes"> & { snakes: Array<TrimmedSnake & { lastMove: Direction }> };
+        statuses: ReturnType<typeof resolveBoardAndGetSnakeStatuses>;
+    }[];
 }
 
 export function getReasonableDirections(snakes: Array<TrimmedSnake>) {
@@ -159,7 +170,7 @@ export function getMoveCommands(
     directionSets: Array<{ id: string, directions: Direction[] }>,
     index = 0,
     current = {}
-) {
+): Array<Record<string, Direction>> {
     if (index === directionSets.length) { return [current]; }
 
     const currentDirections = directionSets[index];

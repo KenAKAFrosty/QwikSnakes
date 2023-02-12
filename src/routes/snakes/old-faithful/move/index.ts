@@ -1,5 +1,5 @@
-import { type RequestEvent } from "@builder.io/qwik-city"
-import { getBackwardsDirection, moveSnake, resolveBoardAndGetSnakeStatuses } from "../../../../game-engine/functions"
+import { type RequestEvent } from "@builder.io/qwik-city";
+import { getMoveOutcomes } from "../../../../game-engine/functions";
 
 export const onPost = async (event: RequestEvent) => {
     const game: {
@@ -11,19 +11,12 @@ export const onPost = async (event: RequestEvent) => {
     console.log(game.board);
 
     const mySnakeIndex = game.board.snakes.findIndex(snake => snake.id === game.you.id);
-    const nonDeathMoves = [];
-    const backwardsDirection = getBackwardsDirection(game.you);
-    for (const move of ["left", "right", "up", "down"] as const) {
-        if (move === backwardsDirection) { continue; }
-        const scenario = JSON.parse(JSON.stringify(game.board));
-        moveSnake(scenario.snakes[mySnakeIndex], move);
-        const statuses = resolveBoardAndGetSnakeStatuses(scenario);
 
-        if (statuses[game.you.id].alive === true) {
-            nonDeathMoves.push(move);
-        }
-    }
-
+    //in future will trim board first for performance, but fine for now
+    const outcomes = getMoveOutcomes(game.board);
+    const nonDeathMoves = outcomes.filter(outcome => outcome.statuses[mySnakeIndex].alive).map(outcome => {
+        return outcome.gameBoard.snakes.find(snake => snake.id === game.you.id)!.lastMove
+    })
     console.log(nonDeathMoves);
     const chosenMove = nonDeathMoves[Math.floor(Math.random() * nonDeathMoves.length)];
 

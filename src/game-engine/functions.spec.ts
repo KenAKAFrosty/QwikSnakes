@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest"
-import { getBackwardsDirection, getMoveCommands, getReasonableDirections, moveSnake, resolveBoardAndGetSnakeStatuses } from "./functions"
+import { getBackwardsDirection, getMoveCommands, getMoveOutcomes, getReasonableDirections, moveSnake, resolveBoardAndGetSnakeStatuses } from "./functions"
 
 
 describe("Game engine", () => {
@@ -485,3 +485,69 @@ describe("Testing directions and move commands calculations", () => {
     })
 
 });
+
+
+
+describe("Get move outcomes", () => {
+    test("One small snake", () => {
+        const trimmedBoard: {
+            width: GameBoard["width"];
+            height: GameBoard["height"];
+            food: GameBoard["food"];
+            hazards: GameBoard["hazards"];
+            snakes: Array<TrimmedSnake>
+        } = {
+            width: 11,
+            height: 11,
+            food: [],
+            hazards: [],
+            snakes: [
+                {
+                    id: "gs_1",
+                    body: [{ x: 5, y: 5 }, { x: 5, y: 6 }, { x: 5, y: 7 }],
+                    health: 100,
+                    squad: ""
+                }
+            ]
+        }
+        //This snake would be facing down, so "up" should not be an outcome
+
+        const outcomes = [
+            {
+                gameBoard: {
+                    food: [], hazards: [], height: 11, snakes: [
+                        { id: "gs_1", body: [{ x: 4, y: 5 }, { x: 5, y: 5 }, { x: 5, y: 6 }], health: 99, squad: "", lastMoved: "left" }
+                    ],
+                    width: 11
+                },
+                statuses: {
+                    gs_1: { alive: true }
+                }
+            },
+            {
+                gameBoard: {
+                    food: [], hazards: [], height: 11, snakes: [
+                        { id: "gs_1", body: [{ x: 6, y: 5 }, { x: 5, y: 5 }, { x: 5, y: 6 }], health: 99, squad: "", lastMoved: "right" }
+                    ],
+                    width: 11
+                },
+                statuses: {
+                    gs_1: { alive: true }
+                }
+            },
+            {
+                gameBoard: {
+                    food: [], hazards: [], height: 11, snakes: [
+                        { id: "gs_1", body: [{ x: 5, y: 4 }, { x: 5, y: 5 }, { x: 5, y: 6 }], health: 99, squad: "", lastMoved: "down" }
+                    ],
+                    width: 11
+                },
+                statuses: {
+                    gs_1: { alive: true }
+                }
+            }
+        ];
+
+        expect(getMoveOutcomes(trimmedBoard)).toEqual(outcomes)
+    })
+})
