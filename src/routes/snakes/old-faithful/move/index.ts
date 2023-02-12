@@ -8,8 +8,10 @@ export const onPost = async (event: RequestEvent) => {
         board: GameBoard,
         you: Snake
     } = await event.request.json();
-    console.log(game); // gonna grab some xamples;
-    const trimmedBoard = { 
+    if (game.turn < 3) {
+        console.log(game); // gonna grab some xamples;
+    }
+    const trimmedBoard = {
         width: game.board.width,
         height: game.board.height,
         food: game.board.food,
