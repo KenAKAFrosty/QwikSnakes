@@ -749,7 +749,7 @@ describe("Get move outcomes", () => {
                     name: 'The Snakening Continues',
                     latency: '31',
                     health: 93,
-                    body: [{ x: 7, y: 2 }, { x: 7, y: 3 }, { x: 8, y: 3 }, { x: 8, y: 4 }],
+                    body: [{ x: 4, y: 6 }, { x: 4, y: 7 }, { x: 4, y: 8 }, { x: 4, y: 9 }, {x: 4, y: 10}],
                     head: { x: 7, y: 2 },
                     length: 4,
                     shout: 'AHHHHHHHH I\'M A SNAKE',
@@ -761,7 +761,7 @@ describe("Get move outcomes", () => {
                     name: 'Hungry Bot',
                     latency: '1',
                     health: 93,
-                    body: [{ x: 4, y: 5 }, { x: 3, y: 5 }, { x: 3, y: 4 }, { x: 3, y: 3 }],
+                    body: [{ x: 3, y: 5}, { x: 4, y: 5 }, { x: 4, y: 4 }, { x: 4, y: 3 }],
                     head: { x: 4, y: 5 },
                     length: 4,
                     shout: '',
@@ -772,5 +772,27 @@ describe("Get move outcomes", () => {
             food: [{ x: 5, y: 5 }, { x: 8, y: 1 }],
             hazards: []
         }
+
+        const mySnakeId = "gs_ptxF68hPjTwRtvgFmyFM3xbV";
+        const outcomes = getMoveOutcomes(exampleBoard);
+        const moveOutcomes: Record<string, {enemiesAlive:number, mySnakeAlive: number}> = {};
+        outcomes.forEach(outcome => {
+            let enemiesAlive = 0;
+            let mySnakeAlive = 0;
+            for (const id in outcome.statuses) {
+                const isAlive = outcome.statuses[id].alive;
+                if (isAlive === false) { continue; }
+                if (id === mySnakeId) { mySnakeAlive++; }
+                else { enemiesAlive++; }
+            }
+            const direction = outcome.gameBoard.snakes.find(snake => snake.id === mySnakeId)!.lastMoved;
+            moveOutcomes[direction] = moveOutcomes[direction] || { enemiesAlive: 0, mySnakeAlive: 0 };
+            moveOutcomes[direction].enemiesAlive += enemiesAlive;
+            moveOutcomes[direction].mySnakeAlive += mySnakeAlive;
+        })
+        // const sortedByLowestEnemiesLeft = Object.entries(enemiesLeftByMove).sort((a, b) => a[1] - b[1]);
+        console.log(moveOutcomes);
+        // console.log(sortedByLowestEnemiesLeft);
+        throw Error('check')
     })
 })

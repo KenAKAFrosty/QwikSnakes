@@ -11,34 +11,35 @@ export const onPost = async (event: RequestEvent) => {
 
     //in future will trim board first for performance, but fine for now
     const outcomes = getMoveOutcomes(game.board);
-    const livingOutComesWithTotalLivingSnakeCounts = [];
-    outcomes.forEach(outcome => {
-        if (outcome.statuses[game.you.id].alive === false) { return; }
 
-        let livingSnakeCount = 0;
+    const mySnakeId = game.you.id;
+    const moveOutcomes: Record<string, { enemiesAlive: number, mySnakeAlive: number }> = {};
+    outcomes.forEach(outcome => {
+        let enemiesAlive = 0;
+        let mySnakeAlive = 0;
         for (const id in outcome.statuses) {
-            if (outcome.statuses[id].alive) { livingSnakeCount++; }
+            const isAlive = outcome.statuses[id].alive;
+            if (isAlive === false) { continue; }
+            if (id === mySnakeId) { mySnakeAlive++; }
+            else { enemiesAlive++; }
         }
-        livingOutComesWithTotalLivingSnakeCounts.push({ ...outcome, livingSnakeCount });
+        const direction = outcome.gameBoard.snakes.find(snake => snake.id === mySnakeId)!.lastMoved;
+        moveOutcomes[direction] = moveOutcomes[direction] || { enemiesAlive: 0, mySnakeAlive: 0 };
+        moveOutcomes[direction].enemiesAlive += enemiesAlive;
+        moveOutcomes[direction].mySnakeAlive += mySnakeAlive;
     });
-    console.log(livingOutComesWithTotalLivingSnakeCounts)
-    const livingOutcomes = outcomes.filter(outcome => outcome.statuses[game.you.id].alive);
-    // const counts = outcomes.filter(outcome => outcome.gameBoard.snakes.length);
-    const nonDeathMoves = livingOutcomes.sort((a, b) => Object.keys(b).length - Object.keys(a).length)
-        .map(outcome => {
-            return outcome.gameBoard.snakes.find(snake => snake.id === game.you.id)!.lastMoved
-        })
-    const nonDeathMoveCount: Record<Direction, number> = {
-        "down": 0,
-        "up": 0,
-        "left": 0,
-        "right": 0
-    };
-    nonDeathMoves.forEach(move => { nonDeathMoveCount[move] += 1; });
-    console.log({ turn: game.turn, moveStillAliveCount: nonDeathMoveCount });
-    const bestLifeChance = Math.max(...Object.values(nonDeathMoveCount));
-    const bestMoves = Object.keys(nonDeathMoveCount).filter(move => nonDeathMoveCount[move as Direction] === bestLifeChance);
-    const chosenMove = bestMoves[Math.floor(Math.random() * bestMoves.length)];
+
+    const maxMySnakeAlive = Math.max(...Object.values(moveOutcomes).map(move => move.mySnakeAlive));
+    const minEnemiesAlive = Math.min(...Object.values(moveOutcomes).map(move => move.enemiesAlive));
+    const goodMoveChoices = [];
+    for (const direction in moveOutcomes) {
+        const move = moveOutcomes[direction];
+        if (move.mySnakeAlive === maxMySnakeAlive && move.enemiesAlive === minEnemiesAlive) {
+            goodMoveChoices.push(direction);
+        }
+    }
+    console.log({ moveOutcomes, goodMoveChoices, turn: game.turn })
+    const chosenMove = goodMoveChoices[Math.floor(Math.random() * goodMoveChoices.length)];
 
     event.headers.set("Content-Type", "application/json");
     event.send(new Response(JSON.stringify({
