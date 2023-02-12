@@ -35,13 +35,12 @@ export const onPost = async (event: RequestEvent) => {
     }) as Array<ReturnType<typeof getMoveOutcomes>[number] & { originalMove: Direction }>
 
 
-    const originalMoveDirectionsAndSurvivors: Record<
-        Direction,
-        Array<Record<string, {
+    const originalMoveDirectionsAndSurvivors: {
+        [key in Direction]?: Array<Record<string, {
             enemiesAlive: number;
             mySnakeAlive: number;
         }>>
-    > = {}
+    } = {}
 
     stillAliveOutcomes.forEach(outcome => {
         if (!originalMoveDirectionsAndSurvivors[outcome.originalMove]) {
@@ -49,14 +48,14 @@ export const onPost = async (event: RequestEvent) => {
         }
         const newSetOfOutcomes = getMoveOutcomes(outcome.gameBoard);
         const newSurvivors = getSurvivorsByMove(newSetOfOutcomes, mySnakeId);
-        originalMoveDirectionsAndSurvivors[outcome.originalMove].push(newSurvivors);
+        originalMoveDirectionsAndSurvivors[outcome.originalMove]!.push(newSurvivors);
     });
 
-    const originalMoveScores: Record<Direction, number> = {}
+    const originalMoveScores: { [k in Direction]?: number } = {}
     for (const direction in originalMoveDirectionsAndSurvivors) {
         const survivors = originalMoveDirectionsAndSurvivors[direction as Direction];
         let score = 0;
-        survivors.forEach(survivor => {
+        survivors!.forEach(survivor => {
             const values = Object.values(survivor);
 
             const enemiesAlive = values.map(v => v.enemiesAlive);
@@ -74,7 +73,7 @@ export const onPost = async (event: RequestEvent) => {
     for (const direction of stayAliveChoices) {
         const { enemiesAlive } = moveSurvivors[direction as Direction];
         if (enemiesAlive !== maxEnemiesAlive) {
-            originalMoveScores[direction as Direction] += 2;
+            originalMoveScores[direction as Direction]! += 2;
         }
     }
 
