@@ -81,7 +81,9 @@ export const onPost = async (event: RequestEvent) => {
     const bestScore = Math.max(...Object.values(originalMoveScores));
     const bestMoves = Object.keys(originalMoveScores).filter(move => originalMoveScores[move as Direction] === bestScore);
     const chosenMove = bestMoves[Math.floor(Math.random() * bestMoves.length)] as Direction;
-    console.log({ turn: game.turn, moveSurvivors, originalMoveScores, bestMoves })
+
+    console.log({ turn: game.turn, moveSurvivors, originalMoveScores, bestMoves, stayAliveChoices })
+
     event.headers.set("Content-Type", "application/json");
     event.send(new Response(JSON.stringify({
         move: chosenMove,
