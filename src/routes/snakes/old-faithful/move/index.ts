@@ -16,7 +16,7 @@ export const onPost = async (event: RequestEvent) => {
     const outcomes = getMoveOutcomes(game.board);
     console.log({ outcomes });
     const nonDeathMoves = outcomes.filter(outcome => outcome.statuses[mySnakeIndex].alive).map(outcome => {
-        return outcome.gameBoard.snakes.find(snake => snake.id === game.you.id)!.lastMove
+        return outcome.gameBoard.snakes.find(snake => snake.id === game.you.id)!.lastMoved
     })
     console.log({ nonDeathMoves });
     const chosenMove = nonDeathMoves[Math.floor(Math.random() * nonDeathMoves.length)];
