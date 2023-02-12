@@ -151,7 +151,7 @@ export function getMoveOutcomes(trimmedBoard: {
 
     return outcomes as {
         gameBoard: Omit<typeof trimmedBoard, "snakes"> & { snakes: Array<TrimmedSnake & { lastMoved: Direction }> };
-        statuses: ReturnType<typeof resolveBoardAndGetSnakeStatuses>;
+        statuses: ReturnType<typeof resolveBoardAndGetSnakeStatuses>; 
     }[];
 }
 
