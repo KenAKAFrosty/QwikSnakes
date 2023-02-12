@@ -30,21 +30,23 @@ export const onPost = async (event: RequestEvent) => {
     });
 
     const maxMySnakeAlive = Math.max(...Object.values(moveOutcomes).map(move => move.mySnakeAlive));
-    const minEnemiesAlive = Math.min(...Object.values(moveOutcomes).map(move => move.enemiesAlive));
-    const goodMoveChoices = [];
+    const stayAliveChoices = [];
     for (const direction in moveOutcomes) {
-        const move = moveOutcomes[direction];
-        if (move.mySnakeAlive === maxMySnakeAlive && move.enemiesAlive === minEnemiesAlive) {
-            goodMoveChoices.push(direction);
+        if (moveOutcomes[direction].mySnakeAlive === maxMySnakeAlive) {
+            stayAliveChoices.push(direction);
         }
     }
+
+    const minEnemiesAlive = Math.min(...stayAliveChoices.map(move => moveOutcomes[move].enemiesAlive));
+    const goodMoveChoices = stayAliveChoices.filter(move => moveOutcomes[move].enemiesAlive === minEnemiesAlive);
+
     console.log({ moveOutcomes, goodMoveChoices, turn: game.turn })
     const chosenMove = goodMoveChoices[Math.floor(Math.random() * goodMoveChoices.length)];
 
     event.headers.set("Content-Type", "application/json");
     event.send(new Response(JSON.stringify({
         move: chosenMove,
-        shout: "AHHHHHHHH I'M A SNAKE"
+        shout: "I HAVE NO MOUTH BUT I MUST SCREAM"
     })))
 }
 
