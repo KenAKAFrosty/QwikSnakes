@@ -146,6 +146,7 @@ export function getMoveOutcomes(trimmedBoard: {
             moveSnake(snake, direction);
         });
         const snakeStatuses = resolveBoardAndGetSnakeStatuses(scenario as GameBoard);
+        console.log({ snakes: scenario.snakes })
         outcomes.push({ gameBoard: scenario, statuses: snakeStatuses })
     })
 

@@ -549,5 +549,8 @@ describe("Get move outcomes", () => {
         ];
 
         expect(getMoveOutcomes(trimmedBoard)).toEqual(outcomes)
-    })
+    });
+
+    
+
 })
