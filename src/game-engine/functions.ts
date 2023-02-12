@@ -214,3 +214,25 @@ This is the simple version with just two arrays for an easy mental map of what i
         return moveCommands;
     }
 */
+
+
+
+
+export function getSurvivorsByMove(outcomes: ReturnType<typeof getMoveOutcomes>, mySnakeId: string) {
+    const moveSurvivors: Record<string, { enemiesAlive: number, mySnakeAlive: number }> = {};
+    outcomes.forEach(outcome => {
+        let enemiesAlive = 0;
+        let mySnakeAlive = 0;
+        for (const id in outcome.statuses) {
+            const isAlive = outcome.statuses[id].alive;
+            if (isAlive === false) { continue; }
+            if (id === mySnakeId) { mySnakeAlive++; }
+            else { enemiesAlive++; }
+        }
+        const direction = outcome.gameBoard.snakes.find(snake => snake.id === mySnakeId)!.lastMoved;
+        moveSurvivors[direction] = moveSurvivors[direction] || { enemiesAlive: 0, mySnakeAlive: 0 };
+        moveSurvivors[direction].enemiesAlive += enemiesAlive;
+        moveSurvivors[direction].mySnakeAlive += mySnakeAlive;
+    });
+    return moveSurvivors;
+}
