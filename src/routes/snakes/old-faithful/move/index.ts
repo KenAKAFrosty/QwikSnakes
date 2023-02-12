@@ -16,7 +16,7 @@ export const onPost = async (event: RequestEvent) => {
     const nonDeathMoves = outcomes.filter(outcome => outcome.statuses[game.you.id].alive).map(outcome => {
         return outcome.gameBoard.snakes.find(snake => snake.id === game.you.id)!.lastMoved
     })
-    console.log({ nonDeathMoves });
+    console.log({ turn: game.turn, nonDeathMoves });
     const moveStillAliveCount: Record<Direction, number> = {
         "down": 0,
         "up": 0,
