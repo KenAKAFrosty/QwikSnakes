@@ -389,7 +389,7 @@ describe("Properly gets backwards direction", () => {
 
 describe("Testing directions and move commands calculations", () => {
 
-    test("Reasonable Directions - three small snakes", () => {
+    test("Reasonable Directions - three small snakes, not using board boundaries", () => {
         const snakes: TrimmedSnake[] = [
             {
                 id: "gs_1",
@@ -417,8 +417,51 @@ describe("Testing directions and move commands calculations", () => {
         ])
     });
 
+
+    test("Reasonable Directions - same three small snakes, but with board boundaries", () => {
+        const snakes: TrimmedSnake[] = [
+            {
+                id: "gs_1",
+                body: [{ x: 0, y: 0 }, { x: 0, y: 1 }, { x: 0, y: 2 }],
+                health: 100,
+                squad: ""
+            },
+            {
+                id: "gs_2",
+                body: [{ x: 9, y: 4 }, { x: 9, y: 3 }, { x: 9, y: 2 }],
+                health: 100,
+                squad: ""
+            },
+            {
+                id: "gs_3",
+                body: [{ x: 4, y: 9 }, { x: 3, y: 9 }, { x: 2, y: 9 }],
+                health: 100,
+                squad: ""
+            },
+        ];
+        expect(getReasonableDirections(snakes, 11, 11)).toEqual([
+            { id: "gs_1", directions: ["right"] },
+            { id: "gs_2", directions: ["left", "right", "up"] },
+            { id: "gs_3", directions: ["right", "up", "down"] }
+        ])
+    });
+
+    test("Reasonable Directions - one more small snake, checking the other two boundaries", () => {
+        const snakes: TrimmedSnake[] = [
+            {
+                id: "gs_1",
+                body: [{ x: 10, y: 10 }, { x: 10, y: 9 }, { x: 10, y: 8 }],
+                health: 100,
+                squad: ""
+            },
+        ];
+        expect(getReasonableDirections(snakes, 11, 11)).toEqual([
+            { id: "gs_1", directions: ["left"] }
+        ])
+    });
+
     test("Move commands - one small snake", () => {
-        const input: Array<{ id: string, directions: ("left" | "right" | "up" | "down")[] }> = [
+        const input: Array<{ id: string, directions: Direction[] }> = [
             { id: "gs_1", directions: ["left", "right", "down"] },
         ]
 
@@ -431,7 +474,7 @@ describe("Testing directions and move commands calculations", () => {
 
 
     test("Move commands - two small snakes", () => {
-        const input: Array<{ id: string, directions: ("left" | "right" | "up" | "down")[] }> = [
+        const input: Array<{ id: string, directions: Direction[] }> = [
             { id: "gs_1", directions: ["left", "right", "down"] },
             { id: "gs_2", directions: ["left", "up"] },
         ]
@@ -447,7 +490,7 @@ describe("Testing directions and move commands calculations", () => {
     });
 
     test("Move commands - three small snakes", () => {
-        const input: Array<{ id: string, directions: ("left" | "right" | "up" | "down")[] }> = [
+        const input: Array<{ id: string, directions: Direction[] }> = [
             { id: "gs_1", directions: ["left", "right", "down"] },
             { id: "gs_2", directions: ["left", "right", "up"] },
             { id: "gs_3", directions: ["right", "up", "down"] }
@@ -510,7 +553,6 @@ describe("Get move outcomes", () => {
                 }
             ]
         }
-        //This snake would be facing down, so "up" should not be an outcome
 
         const outcomes = [
             {
@@ -551,6 +593,184 @@ describe("Get move outcomes", () => {
         expect(getMoveOutcomes(trimmedBoard)).toEqual(outcomes)
     });
 
-    
+    test("One small snake against a corner", () => {
+        const trimmedBoard: {
+            width: GameBoard["width"];
+            height: GameBoard["height"];
+            food: GameBoard["food"];
+            hazards: GameBoard["hazards"];
+            snakes: Array<TrimmedSnake>
+        } = {
+            width: 11,
+            height: 11,
+            food: [],
+            hazards: [],
+            snakes: [
+                {
+                    id: "gs_1",
+                    body: [{ x: 0, y: 0 }, { x: 0, y: 1 }, { x: 0, y: 2 }],
+                    health: 100,
+                    squad: ""
+                }
+            ]
+        }
 
+        const outcomes = [
+            {
+                gameBoard: {
+                    food: [], hazards: [], height: 11, snakes: [
+                        { id: "gs_1", body: [{ x: 1, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 1 }], health: 99, squad: "", lastMoved: "right" }
+                    ],
+                    width: 11
+                },
+                statuses: {
+                    gs_1: { alive: true }
+                }
+            }
+        ];
+
+        expect(getMoveOutcomes(trimmedBoard)).toEqual(outcomes)
+    });
+
+    test("Two small snakes against opposite corners", () => {
+        const trimmedBoard: {
+            width: GameBoard["width"];
+            height: GameBoard["height"];
+            food: GameBoard["food"];
+            hazards: GameBoard["hazards"];
+            snakes: Array<TrimmedSnake>
+        } = {
+            width: 11,
+            height: 11,
+            food: [],
+            hazards: [],
+            snakes: [
+                {
+                    id: "gs_1",
+                    body: [{ x: 0, y: 0 }, { x: 0, y: 1 }, { x: 0, y: 2 }],
+                    health: 100,
+                    squad: ""
+                },
+                {
+                    id: "gs_2",
+                    body: [{ x: 10, y: 10 }, { x: 10, y: 9 }, { x: 10, y: 8 }],
+                    health: 100,
+                    squad: ""
+                }
+            ]
+        }
+
+        const outcomes = [
+            {
+                gameBoard: {
+                    food: [], hazards: [], height: 11, snakes: [
+                        { id: "gs_1", body: [{ x: 1, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 1 }], health: 99, squad: "", lastMoved: "right" },
+                        { id: "gs_2", body: [{ x: 9, y: 10 }, { x: 10, y: 10 }, { x: 10, y: 9 }], health: 99, squad: "", lastMoved: "left" }
+                    ],
+                    width: 11
+                },
+                statuses: {
+                    gs_1: { alive: true },
+                    gs_2: { alive: true }
+                }
+            }
+        ];
+
+        expect(getMoveOutcomes(trimmedBoard)).toEqual(outcomes)
+    });
+
+    test("Two small snakes, one against corner, one against wall", () => {
+        const trimmedBoard: {
+            width: GameBoard["width"];
+            height: GameBoard["height"];
+            food: GameBoard["food"];
+            hazards: GameBoard["hazards"];
+            snakes: Array<TrimmedSnake>
+        } = {
+            width: 11,
+            height: 11,
+            food: [],
+            hazards: [],
+            snakes: [
+                {
+                    id: "gs_1",
+                    body: [{ x: 0, y: 0 }, { x: 0, y: 1 }, { x: 0, y: 2 }],
+                    health: 100,
+                    squad: ""
+                },
+                {
+                    id: "gs_2",
+                    body: [{ x: 10, y: 8 }, { x: 10, y: 7 }, { x: 10, y: 6 }],
+                    health: 100,
+                    squad: ""
+                }
+            ]
+        }
+
+        const outcomes = [
+            {
+                gameBoard: {
+                    food: [], hazards: [], height: 11, snakes: [
+                        { id: "gs_1", body: [{ x: 1, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 1 }], health: 99, squad: "", lastMoved: "right" },
+                        { id: "gs_2", body: [{ x: 9, y: 8 }, { x: 10, y: 8 }, { x: 10, y: 7 }], health: 99, squad: "", lastMoved: "left" }
+                    ],
+                    width: 11
+                },
+                statuses: {
+                    gs_1: { alive: true },
+                    gs_2: { alive: true }
+                }
+            },
+            {
+                gameBoard: {
+                    food: [], hazards: [], height: 11, snakes: [
+                        { id: "gs_1", body: [{ x: 1, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 1 }], health: 99, squad: "", lastMoved: "right" },
+                        { id: "gs_2", body: [{ x: 10, y: 9 }, { x: 10, y: 8 }, { x: 10, y: 7 }], health: 99, squad: "", lastMoved: "up" }
+                    ],
+                    width: 11
+                },
+                statuses: {
+                    gs_1: { alive: true },
+                    gs_2: { alive: true }
+                }
+            },
+        ];
+
+        expect(getMoveOutcomes(trimmedBoard)).toEqual(outcomes)
+    })
+
+    test("Using example full board state", () => {
+        const exampleBoard = {
+            height: 11,
+            width: 11,
+            snakes: [
+                {
+                    id: 'gs_ptxF68hPjTwRtvgFmyFM3xbV',
+                    name: 'The Snakening Continues',
+                    latency: '31',
+                    health: 93,
+                    body: [{ x: 7, y: 2 }, { x: 7, y: 3 }, { x: 8, y: 3 }, { x: 8, y: 4 }],
+                    head: { x: 7, y: 2 },
+                    length: 4,
+                    shout: 'AHHHHHHHH I\'M A SNAKE',
+                    squad: '',
+                    customizations: { color: '#ac7ef4', head: 'beluga', tail: 'mouse' }
+                },
+                {
+                    id: 'gs_6G9xhJ8fVvfvRfqQ4XR43SbR',
+                    name: 'Hungry Bot',
+                    latency: '1',
+                    health: 93,
+                    body: [{ x: 4, y: 5 }, { x: 3, y: 5 }, { x: 3, y: 4 }, { x: 3, y: 3 }],
+                    head: { x: 4, y: 5 },
+                    length: 4,
+                    shout: '',
+                    squad: '',
+                    customizations: { color: '#00cc00', head: 'alligator', tail: 'alligator' }
+                }
+            ],
+            food: [{ x: 5, y: 5 }, { x: 8, y: 1 }],
+            hazards: []
+        }
+    })
 })

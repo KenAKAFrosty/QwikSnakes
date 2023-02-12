@@ -136,7 +136,7 @@ export function getMoveOutcomes(trimmedBoard: {
     hazards: GameBoard["hazards"];
     snakes: Array<TrimmedSnake>
 }) {
-    const reasonableDirections = getReasonableDirections(trimmedBoard.snakes);
+    const reasonableDirections = getReasonableDirections(trimmedBoard.snakes, trimmedBoard.width, trimmedBoard.height);
     const moveCommands = getMoveCommands(reasonableDirections);
     const outcomes: Array<{ gameBoard: typeof trimmedBoard, statuses: ReturnType<typeof resolveBoardAndGetSnakeStatuses> }> = [];
     moveCommands.forEach((command) => {
@@ -151,17 +151,25 @@ export function getMoveOutcomes(trimmedBoard: {
 
     return outcomes as {
         gameBoard: Omit<typeof trimmedBoard, "snakes"> & { snakes: Array<TrimmedSnake & { lastMoved: Direction }> };
-        statuses: ReturnType<typeof resolveBoardAndGetSnakeStatuses>; 
+        statuses: ReturnType<typeof resolveBoardAndGetSnakeStatuses>;
     }[];
 }
 
-export function getReasonableDirections(snakes: Array<TrimmedSnake>) {
+export function getReasonableDirections(snakes: Array<TrimmedSnake>, width?: number, height?: number) {
     const validDirections: Direction[] = ["left", "right", "up", "down"];
     return snakes.map(snake => {
-        const backwards = getBackwardsDirection(snake)
+        const invalidDirections: Direction[] = [];
+        invalidDirections.push(getBackwardsDirection(snake));
+        if (width && height) {
+            const { x, y } = snake.body[0];
+            if (x === 0) { invalidDirections.push("left") }
+            if (x === width - 1) { invalidDirections.push("right") }
+            if (y === 0) { invalidDirections.push("down") }
+            if (y === height - 1) { invalidDirections.push("up") }
+        }
         return {
             id: snake.id,
-            directions: validDirections.filter(dir => dir !== backwards)
+            directions: validDirections.filter(dir => !invalidDirections.includes(dir))
         }
     });
 }
