@@ -18,6 +18,7 @@ export const onPost = async (event: RequestEvent) => {
         const scenario = JSON.parse(JSON.stringify(game.board));
         moveSnake(scenario.snakes[mySnakeIndex], move);
         const statuses = resolveBoardAndGetSnakeStatuses(scenario);
+
         if (statuses[game.you.id].alive === true) {
             nonDeathMoves.push(move);
         }

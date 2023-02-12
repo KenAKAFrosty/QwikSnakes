@@ -27,7 +27,7 @@ export function moveSnake(snake: Snake, direction: "up" | "down" | "left" | "rig
     snake.body = newSnakeBody;
 }
 
-export function getBackwardsDirection(snake: Snake) { 
+export function getBackwardsDirection(snake: TrimmedSnake) {
     const head = snake.body[0];
     const second = snake.body[1];
     if (head.x === second.x) {
@@ -124,3 +124,74 @@ export function processCollisionCheck(snake: Snake, otherSnake: Snake) {
 
     return outcome
 }
+
+
+
+
+export function getMoveOutcomes(trimmedBoard: {
+    width: GameBoard["width"];
+    height: GameBoard["height"];
+    food: GameBoard["food"];
+    hazards: GameBoard["hazards"];
+    snakes: Array<TrimmedSnake>
+}) {
+    const { width, height, food, hazards, snakes } = trimmedBoard;
+
+    const reasonableDirections = getReasonableDirections(snakes);
+    const moveCommands = getMoveCommands(reasonableDirections);
+
+    const outcomes = [];
+    return outcomes;
+}
+
+export function getReasonableDirections(snakes: Array<TrimmedSnake>) {
+    const validDirections: Direction[] = ["left", "right", "up", "down"];
+    return snakes.map(snake => {
+        const backwards = getBackwardsDirection(snake)
+        return {
+            id: snake.id,
+            directions: validDirections.filter(dir => dir !== backwards)
+        }
+    });
+}
+
+export function getMoveCommands(
+    directionSets: Array<{ id: string, directions: Direction[] }>,
+    index = 0,
+    current = {}
+) {
+    if (index === directionSets.length) { return [current]; }
+
+    const currentDirections = directionSets[index];
+    const moveCommands: Array<Record<string, Direction>> = [];
+    for (let i = 0; i < currentDirections.directions.length; i++) {
+        moveCommands.push(
+            ...getMoveCommands(
+                directionSets,
+                index + 1,
+                {
+                    ...current,
+                    [currentDirections.id]: currentDirections.directions[i],
+                }
+            )
+        );
+    }
+
+    return moveCommands;
+}
+/*
+This is the simple version with just two arrays for an easy mental map of what it's doing
+
+    export function _getMoveCommands(directionSets: Array<{ id: string, directions: Direction[] }>) {
+        const moveCommands: Array<Record<string, Direction>> = []
+        for (let i = 0; i < directionSets[0].directions.length; i++) {
+            for (let j = 0; j < directionSets[1].directions.length; j++) {
+                moveCommands.push({
+                    [directionSets[0].id]: directionSets[0].directions[i],
+                    [directionSets[1].id]: directionSets[1].directions[j],
+                });
+            }
+        }
+        return moveCommands;
+    }
+*/

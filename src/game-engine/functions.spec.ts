@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest"
-import { getBackwardsDirection, moveSnake, resolveBoardAndGetSnakeStatuses } from "./functions"
+import { getBackwardsDirection, getMoveCommands, getReasonableDirections, moveSnake, resolveBoardAndGetSnakeStatuses } from "./functions"
 
 
 describe("Game engine", () => {
@@ -384,4 +384,104 @@ describe("Properly gets backwards direction", () => {
             getBackwardsDirection({ body: [{ x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0 }] } as Snake)
         ).toEqual("right")
     });
-})
+});
+
+
+describe("Testing directions and move commands calculations", () => {
+
+    test("Reasonable Directions - three small snakes", () => {
+        const snakes: TrimmedSnake[] = [
+            {
+                id: "gs_1",
+                body: [{ x: 0, y: 0 }, { x: 0, y: 1 }, { x: 0, y: 2 }],
+                health: 100,
+                squad: ""
+            },
+            {
+                id: "gs_2",
+                body: [{ x: 9, y: 4 }, { x: 9, y: 3 }, { x: 9, y: 2 }],
+                health: 100,
+                squad: ""
+            },
+            {
+                id: "gs_3",
+                body: [{ x: 4, y: 9 }, { x: 3, y: 9 }, { x: 2, y: 9 }],
+                health: 100,
+                squad: ""
+            },
+        ];
+        expect(getReasonableDirections(snakes)).toEqual([
+            { id: "gs_1", directions: ["left", "right", "down"] },
+            { id: "gs_2", directions: ["left", "right", "up"] },
+            { id: "gs_3", directions: ["right", "up", "down"] }
+        ])
+    });
+
+    test("Move commands - one small snake", () => {
+        const input: Array<{ id: string, directions: ("left" | "right" | "up" | "down")[] }> = [
+            { id: "gs_1", directions: ["left", "right", "down"] },
+        ]
+
+        expect(getMoveCommands(input)).toEqual([
+            { gs_1: "left" },
+            { gs_1: "right" },
+            { gs_1: "down" },
+        ])
+    });
+
+
+    test("Move commands - two small snakes", () => {
+        const input: Array<{ id: string, directions: ("left" | "right" | "up" | "down")[] }> = [
+            { id: "gs_1", directions: ["left", "right", "down"] },
+            { id: "gs_2", directions: ["left", "up"] },
+        ]
+
+        expect(getMoveCommands(input)).toEqual([
+            { gs_1: "left", gs_2: "left" },
+            { gs_1: "left", gs_2: "up" },
+            { gs_1: "right", gs_2: "left" },
+            { gs_1: "right", gs_2: "up" },
+            { gs_1: "down", gs_2: "left" },
+            { gs_1: "down", gs_2: "up" },
+        ])
+    });
+
+    test("Move commands - three small snakes", () => {
+        const input: Array<{ id: string, directions: ("left" | "right" | "up" | "down")[] }> = [
+            { id: "gs_1", directions: ["left", "right", "down"] },
+            { id: "gs_2", directions: ["left", "right", "up"] },
+            { id: "gs_3", directions: ["right", "up", "down"] }
+        ];
+
+        expect(getMoveCommands(input)).toEqual([
+            { gs_1: "left", gs_2: "left", gs_3: "right" },
+            { gs_1: "left", gs_2: "left", gs_3: "up" },
+            { gs_1: "left", gs_2: "left", gs_3: "down" },
+            { gs_1: "left", gs_2: "right", gs_3: "right" },
+            { gs_1: "left", gs_2: "right", gs_3: "up" },
+            { gs_1: "left", gs_2: "right", gs_3: "down" },
+            { gs_1: "left", gs_2: "up", gs_3: "right" },
+            { gs_1: "left", gs_2: "up", gs_3: "up" },
+            { gs_1: "left", gs_2: "up", gs_3: "down" },
+            { gs_1: "right", gs_2: "left", gs_3: "right" },
+            { gs_1: "right", gs_2: "left", gs_3: "up" },
+            { gs_1: "right", gs_2: "left", gs_3: "down" },
+            { gs_1: "right", gs_2: "right", gs_3: "right" },
+            { gs_1: "right", gs_2: "right", gs_3: "up" },
+            { gs_1: "right", gs_2: "right", gs_3: "down" },
+            { gs_1: "right", gs_2: "up", gs_3: "right" },
+            { gs_1: "right", gs_2: "up", gs_3: "up" },
+            { gs_1: "right", gs_2: "up", gs_3: "down" },
+            { gs_1: "down", gs_2: "left", gs_3: "right" },
+            { gs_1: "down", gs_2: "left", gs_3: "up" },
+            { gs_1: "down", gs_2: "left", gs_3: "down" },
+            { gs_1: "down", gs_2: "right", gs_3: "right" },
+            { gs_1: "down", gs_2: "right", gs_3: "up" },
+            { gs_1: "down", gs_2: "right", gs_3: "down" },
+            { gs_1: "down", gs_2: "up", gs_3: "right" },
+            { gs_1: "down", gs_2: "up", gs_3: "up" },
+            { gs_1: "down", gs_2: "up", gs_3: "down" }
+        ])
+    })
+
+});

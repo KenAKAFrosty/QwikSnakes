@@ -33,3 +33,7 @@ type Snake = {
         tail: string;
     }
 }
+
+type TrimmedSnake = Pick<Snake, "body" | "id" | "health" | "squad">
+
+type Direction = "up" | "down" | "left" | "right"
