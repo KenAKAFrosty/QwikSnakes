@@ -9,9 +9,22 @@ export const onPost = async (event: RequestEvent) => {
         you: Snake
     } = await event.request.json();
 
-    //in future will trim board first for performance, but fine for now
+    const trimmedBoard = { 
+        width: game.board.width,
+        height: game.board.height,
+        food: game.board.food,
+        hazards: game.board.hazards,
+        snakes: game.board.snakes.map(snake => {
+            return {
+                body: snake.body,
+                id: snake.id,
+                health: snake.health,
+                squad: snake.squad
+            }
+        })
+    }
     const mySnakeId = game.you.id;
-    const outcomes = getMoveOutcomes(game.board);
+    const outcomes = getMoveOutcomes(trimmedBoard);
     const moveSurvivors = getSurvivorsByMove(outcomes, mySnakeId);
 
     const maxMySnakeAlive = Math.max(...Object.values(moveSurvivors).map(move => move.mySnakeAlive));
