@@ -1,4 +1,5 @@
 import { describe, expect, test } from "vitest"
+import { getChosenMove } from "~/routes/snakes/old-faithful/move";
 import { getBackwardsDirection, getMoveCommands, getMoveOutcomes, getReasonableDirections, getSurvivorsByMove, moveSnake, resolveBoardAndGetSnakeStatuses } from "./functions"
 
 
@@ -781,78 +782,81 @@ describe("Get move outcomes", () => {
             right: { enemiesAlive: 3, mySnakeAlive: 3 },
             down: { enemiesAlive: 3, mySnakeAlive: 0 },
         });
-
-        const maxMySnakeAlive = Math.max(...Object.values(moveSurvivors).map(move => move.mySnakeAlive));
-        const stayAliveChoices: string[] = [];
-        for (const direction in moveSurvivors) {
-            if (moveSurvivors[direction].mySnakeAlive === maxMySnakeAlive) {
-                stayAliveChoices.push(direction);
-            }
-        }
-
-        //DOUBLE DUTY - This is filtering but we're also mutating the gameBoard to remove dead snakes
-        const stillAliveOutcomes = outcomes.filter(outcome => {
-            const mySnake = outcome.gameBoard.snakes.find(snake => snake.id === mySnakeId)!;
-            (outcome as any).originalMove = mySnake.lastMoved;
-            const keepThisOne = stayAliveChoices.includes(mySnake.lastMoved);
-            if (keepThisOne) {
-                const corpsesRemoved = outcome.gameBoard.snakes.filter(snake => outcome.statuses[snake.id].alive === true);
-                outcome.gameBoard.snakes = corpsesRemoved;
-            }
-            return keepThisOne
-        }) as Array<ReturnType<typeof getMoveOutcomes>[number] & { originalMove: Direction }>
-
-
-        const originalMoveDirectionsAndSurvivors: Record<
-            Direction,
-            Array<Record<string, {
-                enemiesAlive: number;
-                mySnakeAlive: number;
-            }>>
-        > = {}
-
-        let numberOfNewOutcomes = 0;
-        stillAliveOutcomes.forEach(outcome => {
-            if (!originalMoveDirectionsAndSurvivors[outcome.originalMove]) {
-                originalMoveDirectionsAndSurvivors[outcome.originalMove] = [];
-            }
-            const newSetOfOutcomes = getMoveOutcomes(outcome.gameBoard);
-            numberOfNewOutcomes += newSetOfOutcomes.length;
-            const newSurvivors = getSurvivorsByMove(newSetOfOutcomes, mySnakeId);
-            originalMoveDirectionsAndSurvivors[outcome.originalMove].push(newSurvivors);
-        });
-
-        const originalMoveScores: Record<Direction, number> = {}
-        for (const direction in originalMoveDirectionsAndSurvivors) {
-            const survivors = originalMoveDirectionsAndSurvivors[direction as Direction];
-            let score = 0;
-            survivors.forEach(survivor => {
-                const values = Object.values(survivor);
-
-                const enemiesAlive = values.map(v => v.enemiesAlive);
-                const maxEnemiesAlive = Math.max(...enemiesAlive);
-                const diffsCount = enemiesAlive.filter(e => e !== maxEnemiesAlive).length;
-                score += diffsCount;
-                const mySnakeAlive = values.map(v => v.mySnakeAlive);
-                const stillAlives = mySnakeAlive.filter(e => e > 0).length;
-                score += stillAlives;
-            });
-            originalMoveScores[direction as Direction] = score;
-        }
-
-        const maxEnemiesAlive = Math.max(...Object.values(moveSurvivors).map(move => move.enemiesAlive));
-        for (const direction in moveSurvivors) {
-            const { enemiesAlive } = moveSurvivors[direction as Direction];
-            if (enemiesAlive !== maxEnemiesAlive) {
-                originalMoveScores[direction as Direction] += 2;
-            }
-        }
-        
-        const bestScore = Math.max(...Object.values(originalMoveScores));
-        const bestMoves = Object.keys(originalMoveScores).filter(move => originalMoveScores[move as Direction] === bestScore);
-        const chosenMove = bestMoves[Math.floor(Math.random() * bestMoves.length)] as Direction;
-        console.log(chosenMove);
     });
 
 
+});
+
+test("Speed", () => {
+
+    const testBoard = {
+        height: 11,
+        width: 11,
+        snakes: [
+            {
+                id: 'gs_hJbrDpT6fMm9SkCGJmt3c4qF',
+                name: 'The Snakening Continues',
+                latency: '217',
+                health: 98,
+                body: [{ x: 4, y: 8 }, { x: 4, y: 9 }, { x: 5, y: 9 }],
+                head: { x: 4, y: 8 },
+                length: 3,
+                shout: 'I HAVE NO MOUTH BUT I MUST SCREAM',
+                squad: '',
+                customizations: { color: '#ac7ef4', head: 'beluga', tail: 'mouse' }
+            },
+            {
+                id: 'gs_qJBgRRyjSqmJDtChfFT3fvC8',
+                name: 'alpha',
+                latency: '101',
+                health: 100,
+                body: [{ x: 10, y: 6 }, { x: 10, y: 5 }, { x: 9, y: 5 }, { x: 9, y: 5 }],
+                head: { x: 10, y: 6 },
+                length: 4,
+                shout: '',
+                squad: '',
+                customizations: { color: '#3e338f', head: 'evil', tail: 'flame' }
+            },
+            {
+                id: 'gs_dMydyR6Tt8ppDkRqHWRpv7R7',
+                name: 'Unicorn',
+                latency: '98',
+                health: 98,
+                body: [{ x: 2, y: 6 }, { x: 1, y: 6 }, { x: 1, y: 5 }],
+                head: { x: 2, y: 6 },
+                length: 3,
+                shout: '',
+                squad: '',
+                customizations: { color: '#f562f0', head: 'scarf', tail: 'present' }
+            },
+            {
+                id: 'gs_cCG399q6GcFHCV4Dj3bCf93X',
+                name: 'Stupid snake (Just getting started)',
+                latency: '42',
+                health: 100,
+                body: [{ x: 4, y: 0 }, { x: 4, y: 1 }, { x: 5, y: 1 }, { x: 5, y: 1 }],
+                head: { x: 4, y: 0 },
+                length: 4,
+                shout: '',
+                squad: '',
+                customizations: { color: '#00ff00', head: 'alligator', tail: 'alligator' }
+            }
+        ],
+        food: [{ x: 6, y: 10 }, { x: 0, y: 4 }, { x: 5, y: 5 }],
+        hazards: []
+    }
+    const times = [];
+
+    for (let i = 0; i < 1; i++) {
+        const start = Date.now();
+        const choseMove = getChosenMove(testBoard, "gs_hJbrDpT6fMm9SkCGJmt3c4qF");
+        const end = Date.now();
+        times.push(end - start);
+    }
+    const worstTime = Math.max(...times);
+    const bestTime = Math.min(...times);
+    const averageTime = times.reduce((a, b) => a + b, 0) / times.length;
+    console.log(times);
+    console.log({ worstTime, bestTime, averageTime });
 })
+
