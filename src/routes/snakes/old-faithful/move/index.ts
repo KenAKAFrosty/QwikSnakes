@@ -8,7 +8,7 @@ export const onPost = async (event: RequestEvent) => {
         board: GameBoard,
         you: Snake
     } = await event.request.json();
-    // console.log(game.board);
+
 
     //in future will trim board first for performance, but fine for now
     const outcomes = getMoveOutcomes(game.board);
