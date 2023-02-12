@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest"
-import { moveSnake, resolveBoardAndGetSnakeStatuses } from "./functions"
+import { getBackwardsDirection, moveSnake, resolveBoardAndGetSnakeStatuses } from "./functions"
 
 
 describe("Game engine", () => {
@@ -97,7 +97,7 @@ describe("Game engine", () => {
                     shout: 'AHHHHHHHH I\'M A SNAKE',
                     squad: '',
                     customizations: { color: '#ac7ef4', head: 'beluga', tail: 'mouse' }
-                }, 
+                },
                 {
                     id: 'gs_x8HRCtPFT7cHFwwhMWQGWTW4',
                     name: 'Hungry Bot',
@@ -357,5 +357,31 @@ describe("Perform move on snake then assess outcome", () => {
             'gs_yjxcD4dGd9yVF6ycGW6bW8gb': { alive: false },
             'gs_x8HRCtPFT7cHFwwhMWQGWTW4': { alive: true }
         })
+    });
+})
+
+describe("Properly gets backwards direction", () => {
+    test("up", () => {
+        expect(
+            getBackwardsDirection({ body: [{ x: 0, y: 0 }, { x: 0, y: 1 }, { x: 0, y: 2 }] } as Snake)
+        ).toEqual("up")
+    });
+
+    test("down", () => {
+        expect(
+            getBackwardsDirection({ body: [{ x: 0, y: 2 }, { x: 0, y: 1 }, { x: 0, y: 0 }] } as Snake)
+        ).toEqual("down")
+    });
+
+    test("left", () => {
+        expect(
+            getBackwardsDirection({ body: [{ x: 2, y: 0 }, { x: 1, y: 0 }, { x: 0, y: 0 }] } as Snake)
+        ).toEqual("left")
+    });
+
+    test("right", () => {
+        expect(
+            getBackwardsDirection({ body: [{ x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0 }] } as Snake)
+        ).toEqual("right")
     });
 })

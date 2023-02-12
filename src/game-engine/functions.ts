@@ -27,7 +27,16 @@ export function moveSnake(snake: Snake, direction: "up" | "down" | "left" | "rig
     snake.body = newSnakeBody;
 }
 
-
+export function getBackwardsDirection(snake: Snake) { 
+    const head = snake.body[0];
+    const second = snake.body[1];
+    if (head.x === second.x) {
+        if (head.y > second.y) { return "down" }
+        return "up"
+    }
+    if (head.x > second.x) { return "left" }
+    return "right"
+}
 
 export function resolveBoardAndGetSnakeStatuses(board: GameBoard) {
     const snakeStatuses: Record<string, { alive: boolean }> = {};
@@ -37,7 +46,7 @@ export function resolveBoardAndGetSnakeStatuses(board: GameBoard) {
         if (isOutOfBounds(snake, board)) {
             snakeStatuses[id] = { alive: false };
             return;
-        } 
+        }
         if (isCollidedWithSelf(snake)) {
             snakeStatuses[id] = { alive: false };
             return;
@@ -55,7 +64,10 @@ export function resolveBoardAndGetSnakeStatuses(board: GameBoard) {
         }
 
         snake.health -= 1; //add hazards later
-        if (landedOnFood(snake, board)) { snake.health = 100; }
+        if (landedOnFood(snake, board)) {
+            snake.health = 100;
+            snake.body.push(snake.body[snake.body.length - 1])
+        }
         if (snake.health <= 0) { snakeStatuses[id].alive = false }
     });
     return snakeStatuses
@@ -68,12 +80,11 @@ export function landedOnFood(snake: Snake, board: GameBoard) {
 }
 
 export function isOutOfBounds(snake: Snake, board: GameBoard) {
-    // console.log({ body: snake.body, height: board.height, width: board.width })
     const { x, y } = snake.body[0];
     return x < 0 || x >= board.width || y < 0 || y >= board.height
 }
 
-export function isCollidedWithSelf(snake: Snake) { 
+export function isCollidedWithSelf(snake: Snake) {
     const { x, y } = snake.body[0];
     for (let i = 1; i < snake.body.length; i++) {
         const bodyPart = snake.body[i];

@@ -1,5 +1,5 @@
 import { type RequestEvent } from "@builder.io/qwik-city"
-import { moveSnake, resolveBoardAndGetSnakeStatuses } from "../../../../game-engine/functions"
+import { getBackwardsDirection, moveSnake, resolveBoardAndGetSnakeStatuses } from "../../../../game-engine/functions"
 
 export const onPost = async (event: RequestEvent) => {
     const game: {
@@ -12,7 +12,9 @@ export const onPost = async (event: RequestEvent) => {
 
     const mySnakeIndex = game.board.snakes.findIndex(snake => snake.id === game.you.id);
     const nonDeathMoves = [];
+    const backwardsDirection = getBackwardsDirection(game.you);
     for (const move of ["left", "right", "up", "down"] as const) {
+        if (move === backwardsDirection) { continue; }
         const scenario = JSON.parse(JSON.stringify(game.board));
         moveSnake(scenario.snakes[mySnakeIndex], move);
         const statuses = resolveBoardAndGetSnakeStatuses(scenario);
