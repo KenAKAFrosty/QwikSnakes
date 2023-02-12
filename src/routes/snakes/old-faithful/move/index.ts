@@ -10,12 +10,10 @@ export const onPost = async (event: RequestEvent) => {
     } = await event.request.json();
     console.log(game.board);
 
-    const mySnakeIndex = game.board.snakes.findIndex(snake => snake.id === game.you.id);
-
     //in future will trim board first for performance, but fine for now
     const outcomes = getMoveOutcomes(game.board);
     console.log({ outcomes });
-    const nonDeathMoves = outcomes.filter(outcome => outcome.statuses[mySnakeIndex].alive).map(outcome => {
+    const nonDeathMoves = outcomes.filter(outcome => outcome.statuses[game.you.id].alive).map(outcome => {
         return outcome.gameBoard.snakes.find(snake => snake.id === game.you.id)!.lastMoved
     })
     console.log({ nonDeathMoves });
