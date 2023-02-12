@@ -71,7 +71,7 @@ export const onPost = async (event: RequestEvent) => {
     }
 
     const maxEnemiesAlive = Math.max(...Object.values(moveSurvivors).map(move => move.enemiesAlive));
-    for (const direction in moveSurvivors) {
+    for (const direction of stayAliveChoices) {
         const { enemiesAlive } = moveSurvivors[direction as Direction];
         if (enemiesAlive !== maxEnemiesAlive) {
             originalMoveScores[direction as Direction] += 2;
