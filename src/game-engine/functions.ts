@@ -5,10 +5,7 @@ export type TrimmedBoard = {
     hazards: GameBoard["hazards"];
     snakes: Array<TrimmedSnake>
 }
-export type Coordinates = {
-    x: number;
-    y: number;
-}
+export type Coordinates = [number, number]
 
 export function moveSnake(snake: TrimmedSnake, direction: "up" | "down" | "left" | "right") {
     const body = snake.body;
@@ -48,43 +45,6 @@ export function getBackwardsDirection(snake: TrimmedSnake) {
     return "right"
 }
 
-
-
-export function getEasyAccessMapFromBoard(board: Omit<GameBoard, "snakes"> & { snakes: Array<TrimmedSnake> }) {
-    const grid: Record<number, string[]> = {};
-    board.food.forEach(item => {
-        const key = item.x + (item.y * 0.01);
-        if (grid[key]) {
-            grid[key].push("food:");
-        } else {
-            grid[key] = ["food:"];
-        }
-    })
-    board.hazards.forEach(hazard => {
-        const key = hazard.x + (hazard.y * 0.01);
-        if (grid[key]) {
-            grid[key].push("hzrd:");
-        } else {
-            grid[key] = ["hzrd:"];
-        }
-    });
-    board.snakes.forEach((snake) => {
-        snake.body.forEach((part, i) => {
-            const { x, y } = part;
-            const label = (i === 0) ? "head" : "body";
-            const key = x + (y * 0.01);
-            const value = `${label}:${snake.id}`;
-            if (grid[key]) {
-                grid[key].push(value);
-            } else {
-                grid[key] = [value];
-            }
-        })
-    });
-    return grid;
-}
-
-
 export function resolveBoardAndGetSnakeAliveStatuses(board: Map<keyof GameBoard, any>) {
     const snakeAliveStatuses = new Map<string, boolean>();
     board.get("snakes").forEach((snake: TrimmedSnake) => {
@@ -123,7 +83,7 @@ export function resolveBoardAndGetSnakeAliveStatuses(board: Map<keyof GameBoard,
 
 export function landedOnFood(snake: TrimmedSnake, board: Map<keyof GameBoard, any>) {
     const { x, y } = snake.body[0];
-    const foodIndex = board.get("food").findIndex((food: { x: number, y: number }) => food.x === x && food.y === y);
+    const foodIndex = board.get("food").findIndex((food: Coordinates) => food[0] === x && food[1] === y);
     return foodIndex > -1
 }
 
@@ -197,8 +157,8 @@ export function getMoveOutcomes(trimmedBoard: Map<keyof TrimmedBoard, any>) {
         const scenario = new Map<keyof TrimmedBoard, any>([
             ["width", trimmedBoard.get("width")],
             ["height", trimmedBoard.get("height")],
-            ["food", trimmedBoard.get("food").map((food: Coordinates) => ({ x: food.x, y: food.y }))],
-            ["hazards", trimmedBoard.get("hazards").map((hazard: Coordinates) => ({ x: hazard.x, y: hazard.y }))],
+            ["food", trimmedBoard.get("food").map((food: Coordinates) => [food[0], food[1]])],
+            ["hazards", trimmedBoard.get("hazards").map((hazard: Coordinates) => [hazard[0], hazard[1]])],
             ["snakes", trimmedBoard.get("snakes").map((snake: TrimmedSnake) => moveSnake({
                 id: snake.id,
                 body: snake.body.map(bodyPart => ({ x: bodyPart.x, y: bodyPart.y })),

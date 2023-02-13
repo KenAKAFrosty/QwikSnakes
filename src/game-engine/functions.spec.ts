@@ -1,6 +1,15 @@
 import { describe, expect, test } from "vitest"
 import { getChosenMove } from "~/routes/snakes/old-faithful/move";
-import { type TrimmedBoard, getBackwardsDirection, getEasyAccessMapFromBoard, getMoveCommands, getMoveOutcomes, getReasonableDirections, getSurvivorsByMove, moveSnake, resolveBoardAndGetSnakeAliveStatuses } from "./functions"
+import {
+    type TrimmedBoard,
+    getBackwardsDirection,
+    getMoveCommands,
+    getMoveOutcomes,
+    getReasonableDirections,
+    getSurvivorsByMove,
+    moveSnake,
+    resolveBoardAndGetSnakeAliveStatuses
+} from "./functions"
 
 
 
@@ -9,7 +18,7 @@ describe("Game engine", () => {
         expect(resolveBoardAndGetSnakeAliveStatuses(new Map<keyof TrimmedBoard, any>([
             ["width", 11],
             ["height", 11],
-            ["food", [{ x: 10, y: 2 }, { x: 5, y: 5 }, { x: 3, y: 2 }]],
+            ["food", [[10, 2], [5, 5], [3, 2]]],
             ["snakes", [
                 {
                     id: 'gs_yjxcD4dGd9yVF6ycGW6bW8gb',
@@ -73,7 +82,7 @@ describe("Game engine", () => {
                     customizations: { color: '#00cc00', head: 'alligator', tail: 'alligator' }
                 }
             ]],
-            ['food', [{ x: 10, y: 2 }, { x: 5, y: 5 }, { x: 3, y: 2 }]],
+            ['food', [[10, 2], [5, 5], [3, 2]]],
             ['hazards', []]
         ]))).toEqual(new Map([
             ['gs_yjxcD4dGd9yVF6ycGW6bW8gb', false],
@@ -111,7 +120,7 @@ describe("Game engine", () => {
                     customizations: { color: '#00cc00', head: 'alligator', tail: 'alligator' }
                 }
             ]],
-            ['food', [{ x: 10, y: 2 }, { x: 5, y: 5 }, { x: 3, y: 2 }]],
+            ['food', [[10, 2], [5, 5], [3, 2]]],
             ['hazards', []]
         ]))).toEqual(new Map([
             ['gs_yjxcD4dGd9yVF6ycGW6bW8gb', false],
@@ -121,42 +130,41 @@ describe("Game engine", () => {
 
 
     test("resolve board basic out of bounds death", () => {
-        expect(resolveBoardAndGetSnakeAliveStatuses(
-            new Map<keyof TrimmedBoard, any>([
-                ['height', 11],
-                ['width', 11],
-                ['snakes', [
-                    {
-                        id: 'gs_yjxcD4dGd9yVF6ycGW6bW8gb',
-                        name: 'The Snakening Continues',
-                        latency: '128',
-                        health: 92,
-                        body: [{ x: 9, y: 11 }, { x: 9, y: 10 }, { x: 9, y: 9 }],
-                        head: { x: 9, y: 9 },
-                        length: 3,
-                        shout: 'AHHHHHHHH I\'M A SNAKE',
-                        squad: '',
-                        customizations: { color: '#ac7ef4', head: 'beluga', tail: 'mouse' }
-                    },
-                    {
-                        id: 'gs_x8HRCtPFT7cHFwwhMWQGWTW4',
-                        name: 'Hungry Bot',
-                        latency: '1',
-                        health: 94,
-                        body: [{ x: 4, y: 4 }, { x: 4, y: 3 }, { x: 3, y: 3 }, { x: 2, y: 3 }],
-                        head: { x: 4, y: 4 },
-                        length: 4,
-                        shout: '',
-                        squad: '',
-                        customizations: { color: '#00cc00', head: 'alligator', tail: 'alligator' }
-                    }
-                ]],
-                ['food', [{ x: 10, y: 2 }, { x: 5, y: 5 }, { x: 3, y: 2 }]],
-                ['hazards', []]
-            ]))).toEqual(new Map([
-                ['gs_yjxcD4dGd9yVF6ycGW6bW8gb', false],
-                ['gs_x8HRCtPFT7cHFwwhMWQGWTW4', true]
-            ]))
+        expect(resolveBoardAndGetSnakeAliveStatuses(new Map<keyof TrimmedBoard, any>([
+            ['height', 11],
+            ['width', 11],
+            ['snakes', [
+                {
+                    id: 'gs_yjxcD4dGd9yVF6ycGW6bW8gb',
+                    name: 'The Snakening Continues',
+                    latency: '128',
+                    health: 92,
+                    body: [{ x: 9, y: 11 }, { x: 9, y: 10 }, { x: 9, y: 9 }],
+                    head: { x: 9, y: 9 },
+                    length: 3,
+                    shout: 'AHHHHHHHH I\'M A SNAKE',
+                    squad: '',
+                    customizations: { color: '#ac7ef4', head: 'beluga', tail: 'mouse' }
+                },
+                {
+                    id: 'gs_x8HRCtPFT7cHFwwhMWQGWTW4',
+                    name: 'Hungry Bot',
+                    latency: '1',
+                    health: 94,
+                    body: [{ x: 4, y: 4 }, { x: 4, y: 3 }, { x: 3, y: 3 }, { x: 2, y: 3 }],
+                    head: { x: 4, y: 4 },
+                    length: 4,
+                    shout: '',
+                    squad: '',
+                    customizations: { color: '#00cc00', head: 'alligator', tail: 'alligator' }
+                }
+            ]],
+            ['food', [[10, 2], [5, 5], [3, 2]]],
+            ['hazards', []]
+        ]))).toEqual(new Map([
+            ['gs_yjxcD4dGd9yVF6ycGW6bW8gb', false],
+            ['gs_x8HRCtPFT7cHFwwhMWQGWTW4', true]
+        ]))
 
         expect(resolveBoardAndGetSnakeAliveStatuses(new Map<keyof TrimmedBoard, any>([
             ['height', 11],
@@ -187,7 +195,7 @@ describe("Game engine", () => {
                     customizations: { color: '#00cc00', head: 'alligator', tail: 'alligator' }
                 }
             ]],
-            ['food', [{ x: 10, y: 2 }, { x: 5, y: 5 }, { x: 3, y: 2 }]],
+            ['food', [[10, 2], [5, 5], [3, 2]]],
             ['hazards', []]
         ]))).toEqual(new Map([
             ['gs_yjxcD4dGd9yVF6ycGW6bW8gb', false],
@@ -226,7 +234,7 @@ describe("Game engine", () => {
                     customizations: { color: '#00cc00', head: 'alligator', tail: 'alligator' }
                 }
             ]],
-            ['food', [{ x: 10, y: 2 }, { x: 5, y: 5 }, { x: 3, y: 2 }]],
+            ['food', [[10, 2], [5, 5], [3, 2]]],
             ['hazards', []]
         ])
         )).toEqual(new Map([
@@ -264,7 +272,7 @@ describe("Game engine", () => {
                     customizations: { color: '#00cc00', head: 'alligator', tail: 'alligator' }
                 }
             ]],
-            ["food", [{ x: 10, y: 2 }, { x: 4, y: 4 }, { x: 3, y: 2 }]],
+            ["food", [[10, 2], [4, 4], [3, 2]]],
             ["hazards", []]
         ])
         )).toEqual(new Map([
@@ -347,7 +355,7 @@ describe("Perform move on snake then assess outcome", () => {
                     customizations: { color: '#00cc00', head: 'alligator', tail: 'alligator' }
                 }
             ]],
-            ["food", [{ x: 10, y: 2 }, { x: 4, y: 4 }, { x: 3, y: 2 }]],
+            ["food", [[10, 2], [4, 4], [3, 2]]],
             ["hazards", []]
         ]);
 
@@ -763,7 +771,7 @@ describe("Get move outcomes", () => {
                     customizations: { color: '#00cc00', head: 'alligator', tail: 'alligator' }
                 }
             ]],
-            ["food", [{ x: 5, y: 5 }, { x: 8, y: 1 }]],
+            ["food", [[5, 5], [8, 1]]],
             ["hazards", []]
         ]);
 
@@ -777,140 +785,6 @@ describe("Get move outcomes", () => {
         ]));
     });
 });
-
-describe("Grid from Board", () => {
-
-    test("just one small snake no others", () => {
-
-        expect(getEasyAccessMapFromBoard({
-            height: 11,
-            width: 11,
-            food: [],
-            hazards: [],
-            snakes: [
-                {
-                    id: "gs_1",
-                    body: [{ x: 0, y: 0 }, { x: 0, y: 1 }, { x: 0, y: 2 }],
-                    health: 100,
-                    squad: ""
-                }
-            ]
-        })).toEqual({
-            [0.0]: ["head:gs_1"],
-            [0.01]: ["body:gs_1"],
-            [0.02]: ["body:gs_1"],
-        });
-
-    });
-
-    test("Using 10 y value to demonstrate its behavior", () => {
-
-        expect(getEasyAccessMapFromBoard({
-            height: 11,
-            width: 11,
-            food: [],
-            hazards: [],
-            snakes: [
-                {
-                    id: "gs_1",
-                    body: [
-                        { x: 0, y: 10 },
-                        { x: 1, y: 10 },
-                        { x: 2, y: 10 },
-                        { x: 3, y: 10 },
-                        { x: 4, y: 10 },
-                        { x: 5, y: 10 },
-                        { x: 6, y: 10 },
-                        { x: 7, y: 10 },
-                        { x: 8, y: 10 },
-                        { x: 9, y: 10 },
-                        { x: 10, y: 10 },
-                    ],
-                    health: 100,
-                    squad: ""
-                }
-            ]
-        })).toEqual({
-            [0.1]: ["head:gs_1"],
-            [1.1]: ["body:gs_1"],
-            [2.1]: ["body:gs_1"],
-            [3.1]: ["body:gs_1"],
-            [4.1]: ["body:gs_1"],
-            [5.1]: ["body:gs_1"],
-            [6.1]: ["body:gs_1"],
-            [7.1]: ["body:gs_1"],
-            [8.1]: ["body:gs_1"],
-            [9.1]: ["body:gs_1"],
-            [10.1]: ["body:gs_1"],
-        })
-    })
-
-    test("no snakes just food and hazards", () => {
-
-        expect(getEasyAccessMapFromBoard({
-            height: 11,
-            width: 11,
-            food: [
-                { x: 0, y: 0 },
-                { x: 2, y: 4 },
-            ],
-            hazards: [
-                { x: 0, y: 0 },
-                { x: 3, y: 7 },
-            ],
-            snakes: []
-        })).toEqual({
-            [0.0]: ["food:", "hzrd:"],
-            [2.04]: ["food:"],
-            [3.07]: ["hzrd:"],
-        });
-
-    });
-
-    test("all of em", () => {
-
-        expect(getEasyAccessMapFromBoard({
-            height: 11,
-            width: 11,
-            food: [
-                { x: 0, y: 10 }
-            ],
-            hazards: [
-                { x: 0, y: 10 },
-            ],
-            snakes: [
-                {
-                    id: "gs_1",
-                    body: [
-                        { x: 0, y: 10 },
-                        { x: 1, y: 10 },
-                        { x: 2, y: 10 },
-                    ],
-                    health: 100,
-                    squad: ""
-                }
-            ]
-        })).toEqual({
-            [0.1]: ["food:", "hzrd:", "head:gs_1"],
-            [1.1]: ["body:gs_1"],
-            [2.1]: ["body:gs_1"],
-        });
-
-    });
-})
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 test("Speed", () => {
@@ -945,7 +819,7 @@ test("Speed", () => {
                 squad: '',
             }
         ]],
-        ["food", [{ x: 6, y: 10 }, { x: 0, y: 4 }, { x: 5, y: 5 }]],
+        ["food", [[6, 10], [0, 4], [5, 5]]],
         ["hazards", []]
     ]);
     const times = [];
