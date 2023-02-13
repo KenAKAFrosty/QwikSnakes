@@ -34,6 +34,6 @@ type Snake = {
     }
 }
 
-type TrimmedSnake = Pick<Snake, "body" | "id" | "health" | "squad">
+type TrimmedSnake = Pick<Snake, "body" | "id" | "health" | "squad"> & { lastMoved?: Direction }
 
 type Direction = "up" | "down" | "left" | "right"

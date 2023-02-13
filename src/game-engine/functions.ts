@@ -1,3 +1,15 @@
+export type TrimmedBoard = {
+    width: GameBoard["width"];
+    height: GameBoard["height"];
+    food: GameBoard["food"];
+    hazards: GameBoard["hazards"];
+    snakes: Array<TrimmedSnake>
+}
+export type Coordinates = {
+    x: number;
+    y: number;
+}
+
 export function moveSnake(snake: TrimmedSnake, direction: "up" | "down" | "left" | "right") {
     const body = snake.body;
     for (let i = body.length - 1; i >= 0; i--) {
@@ -21,7 +33,8 @@ export function moveSnake(snake: TrimmedSnake, direction: "up" | "down" | "left"
             }
         }
     }
-    (snake as TrimmedSnake & { lastMoved: Direction }).lastMoved = direction;
+    snake.lastMoved = direction;
+    return snake;
 }
 
 export function getBackwardsDirection(snake: TrimmedSnake) {
@@ -72,9 +85,9 @@ export function getEasyAccessMapFromBoard(board: Omit<GameBoard, "snakes"> & { s
 }
 
 
-export function resolveBoardAndGetSnakeAliveStatuses(board: GameBoard) {
+export function resolveBoardAndGetSnakeAliveStatuses(board: Map<keyof GameBoard, any>) {
     const snakeAliveStatuses = new Map<string, boolean>();
-    board.snakes.forEach((snake) => {
+    board.get("snakes").forEach((snake: TrimmedSnake) => {
         const id = snake.id;
         if (snakeAliveStatuses.get(id) === false) { return }
         if (isOutOfBounds(snake, board)) {
@@ -96,8 +109,8 @@ export function resolveBoardAndGetSnakeAliveStatuses(board: GameBoard) {
         }
 
         snakeAliveStatuses.set(id, true);
-        for (let i = 0; i < board.snakes.length; i++) {
-            const otherSnake = board.snakes[i];
+        for (let i = 0; i < board.get("snakes").length; i++) {
+            const otherSnake = board.get("snakes")[i];
             if (id === otherSnake.id) { continue; }
             if (snakeAliveStatuses.get(otherSnake.id) === false) { continue; }
             processCollisionCheck(snake, otherSnake, snakeAliveStatuses);
@@ -108,18 +121,18 @@ export function resolveBoardAndGetSnakeAliveStatuses(board: GameBoard) {
     return snakeAliveStatuses
 }
 
-export function landedOnFood(snake: Snake, board: GameBoard) {
+export function landedOnFood(snake: TrimmedSnake, board: Map<keyof GameBoard, any>) {
     const { x, y } = snake.body[0];
-    const foodIndex = board.food.findIndex((food) => food.x === x && food.y === y);
+    const foodIndex = board.get("food").findIndex((food: { x: number, y: number }) => food.x === x && food.y === y);
     return foodIndex > -1
 }
 
-export function isOutOfBounds(snake: Snake, board: GameBoard) {
+export function isOutOfBounds(snake: TrimmedSnake, board: Map<keyof GameBoard, any>) {
     const { x, y } = snake.body[0];
-    return x < 0 || x >= board.width || y < 0 || y >= board.height
+    return x < 0 || x >= board.get("width") || y < 0 || y >= board.get("height")
 }
 
-export function isCollidedWithSelf(snake: Snake) {
+export function isCollidedWithSelf(snake: TrimmedSnake) {
     const { x, y } = snake.body[0];
     for (let i = 1; i < snake.body.length; i++) {
         const bodyPart = snake.body[i];
@@ -128,7 +141,7 @@ export function isCollidedWithSelf(snake: Snake) {
     return false;
 }
 
-export function processCollisionCheck(snake: Snake, otherSnake: Snake, snakeAliveStatuses: Map<string, boolean>) {
+export function processCollisionCheck(snake: TrimmedSnake, otherSnake: Snake, snakeAliveStatuses: Map<string, boolean>) {
     const snakeId = snake.id;
     const otherSnakeId = otherSnake.id;
     const { x, y } = snake.body[0];
@@ -165,42 +178,42 @@ export function processCollisionCheck(snake: Snake, otherSnake: Snake, snakeAliv
 
 
 
-export function getMoveOutcomes(trimmedBoard: {
-    width: GameBoard["width"];
-    height: GameBoard["height"];
-    food: GameBoard["food"];
-    hazards: GameBoard["hazards"];
-    snakes: Array<TrimmedSnake>
-}) {
-    console.time("getReasonableDirections")
-    const reasonableDirections = getReasonableDirections(trimmedBoard.snakes, trimmedBoard.width, trimmedBoard.height);
-    console.timeEnd("getReasonableDirections")
-    console.time("getMoveCommands")
+export function getMoveOutcomes(trimmedBoard: Map<keyof TrimmedBoard, any>) {
+    console.time("1")
+    const reasonableDirections = getReasonableDirections(
+        trimmedBoard.get("snakes") as TrimmedSnake[],
+        trimmedBoard.get("width") as number,
+        trimmedBoard.get("height") as number
+    );
+    console.timeEnd("1")
+    console.time("2")
     const moveCommands = getMoveCommands(reasonableDirections);
-    console.timeEnd("getMoveCommands")
+    console.timeEnd("2")
 
-    const outcomes: Array<{ gameBoard: typeof trimmedBoard, statuses: ReturnType<typeof resolveBoardAndGetSnakeAliveStatuses> }> = [];
+    // const outcomes: Array<{ gameBoard: Map<keyof TrimmedBoard, any>, statuses: ReturnType<typeof resolveBoardAndGetSnakeAliveStatuses> }> = [];
 
-    moveCommands.forEach((command, i) => {
-        const scenario = {
-            width: trimmedBoard.width,
-            height: trimmedBoard.height,
-            food: trimmedBoard.food.map(food => ({ x: food.x, y: food.y })),
-            hazards: trimmedBoard.hazards.map(hazard => ({ x: hazard.x, y: hazard.y })),
-            snakes: trimmedBoard.snakes.map(snake => ({
+    console.time("3")
+    const outcomes = moveCommands.map((command, i) => {
+        const scenario = new Map<keyof TrimmedBoard, any>([
+            ["width", trimmedBoard.get("width")],
+            ["height", trimmedBoard.get("height")],
+            ["food", trimmedBoard.get("food").map((food: Coordinates) => ({ x: food.x, y: food.y }))],
+            ["hazards", trimmedBoard.get("hazards").map((hazard: Coordinates) => ({ x: hazard.x, y: hazard.y }))],
+            ["snakes", trimmedBoard.get("snakes").map((snake: TrimmedSnake) => moveSnake({
                 id: snake.id,
                 body: snake.body.map(bodyPart => ({ x: bodyPart.x, y: bodyPart.y })),
                 health: snake.health,
                 squad: snake.squad,
-            }))
-        }
-        scenario.snakes.forEach(snake => moveSnake(snake, command[snake.id]));
-        const snakeAliveStatuses = resolveBoardAndGetSnakeAliveStatuses(scenario as GameBoard);
-        outcomes[i] = { gameBoard: scenario, statuses: snakeAliveStatuses }
+            },
+                command[snake.id]
+            ))]
+        ]);
+        return { gameBoard: scenario, statuses: resolveBoardAndGetSnakeAliveStatuses(scenario) }
     })
+    console.timeEnd("3")
 
     return outcomes as {
-        gameBoard: Omit<typeof trimmedBoard, "snakes"> & { snakes: Array<TrimmedSnake & { lastMoved: Direction }> };
+        gameBoard: Map<keyof TrimmedBoard, any>;
         statuses: ReturnType<typeof resolveBoardAndGetSnakeAliveStatuses>;
     }[];
 }
@@ -285,7 +298,7 @@ export function getSurvivorsByMove(outcomes: ReturnType<typeof getMoveOutcomes>,
             if (id === mySnakeId) { mySnakeAlive++; }
             else { enemiesAlive++; }
         });
-        const direction = outcome.gameBoard.snakes.find(snake => snake.id === mySnakeId)!.lastMoved;
+        const direction = outcome.gameBoard.get("snakes").find((snake: TrimmedSnake) => snake.id === mySnakeId)!.lastMoved;
         const currentTuple = moveSurvivors.get(direction) || [0, 0];
         currentTuple[0] += enemiesAlive;
         currentTuple[1] += mySnakeAlive;
