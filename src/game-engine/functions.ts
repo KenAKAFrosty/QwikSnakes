@@ -287,6 +287,7 @@ This is the simple version with just two arrays for an easy mental map of what i
 
 export function getSurvivorsByMove(outcomes: ReturnType<typeof getMoveOutcomes>, mySnakeId: string) {
     const moveSurvivors: Record<string, { enemiesAlive: number, mySnakeAlive: number }> = {};
+    
     outcomes.forEach(outcome => {
         let enemiesAlive = 0;
         let mySnakeAlive = 0;
