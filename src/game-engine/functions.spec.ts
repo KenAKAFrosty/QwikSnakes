@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest"
 import { getChosenMove } from "~/routes/snakes/old-faithful/move";
-import { getBackwardsDirection, getMoveCommands, getMoveOutcomes, getReasonableDirections, getSurvivorsByMove, moveSnake, resolveBoardAndGetSnakeStatuses } from "./functions"
+import { getBackwardsDirection, getGridFromBoard, getMoveCommands, getMoveOutcomes, getReasonableDirections, getSurvivorsByMove, moveSnake, resolveBoardAndGetSnakeStatuses } from "./functions"
 
 
 describe("Game engine", () => {
@@ -787,7 +787,111 @@ describe("Get move outcomes", () => {
 
 });
 
-test("Speed", () => {
+describe("Grid from Board", () => {
+
+    test("just one small snake no others", () => {
+
+        expect(getGridFromBoard({
+            height: 11,
+            width: 11,
+            food: [],
+            hazards: [],
+            snakes: [
+                {
+                    id: "gs_1",
+                    body: [{ x: 0, y: 0 }, { x: 0, y: 1 }, { x: 0, y: 2 }],
+                    health: 100,
+                    squad: ""
+                }
+            ]
+        })).toEqual({
+            [0.0]: ["head:gs_1"],
+            [0.01]: ["body:gs_1"],
+            [0.02]: ["body:gs_1"],
+        });
+
+    });
+
+    test("Using 10 y value to demonstrate its behavior", () => {
+
+        expect(getGridFromBoard({
+            height: 11,
+            width: 11,
+            food: [],
+            hazards: [],
+            snakes: [
+                {
+                    id: "gs_1",
+                    body: [
+                        { x: 0, y: 10 },
+                        { x: 1, y: 10 },
+                        { x: 2, y: 10 },
+                        { x: 3, y: 10 },
+                        { x: 4, y: 10 },
+                        { x: 5, y: 10 },
+                        { x: 6, y: 10 },
+                        { x: 7, y: 10 },
+                        { x: 8, y: 10 },
+                        { x: 9, y: 10 },
+                        { x: 10, y: 10 },
+                    ],
+                    health: 100,
+                    squad: ""
+                }
+            ]
+        })).toEqual({
+            [0.1]: ["head:gs_1"],
+            [1.1]: ["body:gs_1"],
+            [2.1]: ["body:gs_1"],
+            [3.1]: ["body:gs_1"],
+            [4.1]: ["body:gs_1"],
+            [5.1]: ["body:gs_1"],
+            [6.1]: ["body:gs_1"],
+            [7.1]: ["body:gs_1"],
+            [8.1]: ["body:gs_1"],
+            [9.1]: ["body:gs_1"],
+            [10.1]: ["body:gs_1"],
+        })
+    })
+
+    test("no snakes just food and hazards", () => {
+
+        expect(getGridFromBoard({
+            height: 11,
+            width: 11,
+            food: [
+                { x: 0, y: 0 },
+                { x: 2, y: 4 },
+            ],
+            hazards: [
+                { x: 0, y: 0 },
+                { x: 3, y: 7 },
+            ],
+            snakes: []
+        })).toEqual({
+            [0.0]: ["food:", "hzrd:"],
+            [2.04]: ["food:"],
+            [3.07]: ["hzrd:"],
+        });
+
+    });
+})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+test.skip("Speed", () => {
 
     const testBoard = {
         height: 11,

@@ -1,30 +1,26 @@
 export function moveSnake(snake: TrimmedSnake, direction: "up" | "down" | "left" | "right") {
-    const head = snake.body[0];
-    let newHead: Snake["body"][number];
-    switch (direction) {
-        case "up":
-            newHead = { x: head.x, y: head.y + 1 };
-            break;
-        case "down":
-            newHead = { x: head.x, y: head.y - 1 };
-            break;
-        case "left":
-            newHead = { x: head.x - 1, y: head.y };
-            break;
-        case "right":
-            newHead = { x: head.x + 1, y: head.y };
-            break;
+    const body = snake.body;
+    for (let i = body.length - 1; i >= 0; i--) {
+        if (i !== 0) {
+            body[i].x = body[i - 1].x;
+            body[i].y = body[i - 1].y;
+        } else {
+            switch (direction) {
+                case "up":
+                    body[i].y++;
+                    break;
+                case "down":
+                    body[i].y--;
+                    break;
+                case "left":
+                    body[i].x--;
+                    break;
+                case "right":
+                    body[i].x++;
+                    break;
+            }
+        }
     }
-
-    const length = snake.body.length;
-    const hasStackedTail = snake.body[length - 1].x === snake.body[length - 2].x && snake.body[length - 1].y === snake.body[length - 2].y;
-    const newSnakeBody: Snake["body"] = [newHead];
-    const targetLength = hasStackedTail ? length - 1 : length;
-    for (let i = 1; i < targetLength; i++) {
-        newSnakeBody.push(snake.body[i - 1]);
-    }
-    if (hasStackedTail) { newSnakeBody.push(snake.body[length - 1]); }
-    snake.body = newSnakeBody;
     (snake as TrimmedSnake & { lastMoved: Direction }).lastMoved = direction;
 }
 
@@ -38,6 +34,53 @@ export function getBackwardsDirection(snake: TrimmedSnake) {
     if (head.x > second.x) { return "left" }
     return "right"
 }
+
+
+
+export function getGridFromBoard(board: Omit<GameBoard, "snakes"> & { snakes: Array<TrimmedSnake> }) {
+    const grid: Record<number, string[]> = {};
+    board.snakes.forEach((snake) => {
+        snake.body.forEach((part, i) => {
+            const { x, y } = part;
+            const label = (i === 0) ? "head" : "body";
+            const key = x + (y * 0.01);
+            const value = `${label}:${snake.id}`;
+            if (grid[key]) {
+                grid[key].push(value);
+            } else {
+                grid[key] = [value];
+            }
+        })
+    });
+    board.food.forEach(item => {
+        const key = item.x + (item.y * 0.01);
+        if (grid[key]) {
+            grid[key].push("food:");
+        } else {
+            grid[key] = ["food:"];
+        }
+    })
+    board.hazards.forEach(hazard => {
+        const key = hazard.x + (hazard.y * 0.01);
+        if (grid[key]) {
+            grid[key].push("hzrd:");
+        } else {
+            grid[key] = ["hzrd:"];
+        }
+    });
+
+    return grid;
+}
+
+// export function _resolveBoardAndGetSnakeStatuses(board: GameBoard) {
+//     const grid: Record<number, string> = {};
+
+// }
+
+
+
+
+
 
 export function resolveBoardAndGetSnakeStatuses(board: GameBoard) {
     const snakeStatuses: Record<string, { alive: boolean }> = {};
@@ -140,11 +183,17 @@ export function getMoveOutcomes(trimmedBoard: {
     hazards: GameBoard["hazards"];
     snakes: Array<TrimmedSnake>
 }) {
+    console.time("reasonable directions")
     const reasonableDirections = getReasonableDirections(trimmedBoard.snakes, trimmedBoard.width, trimmedBoard.height);
+    console.timeEnd("reasonable directions")
+
+    console.time("get move commands")
     const moveCommands = getMoveCommands(reasonableDirections);
+    console.timeEnd("get move commands")
+
     const outcomes: Array<{ gameBoard: typeof trimmedBoard, statuses: ReturnType<typeof resolveBoardAndGetSnakeStatuses> }> = [];
 
-    moveCommands.forEach((command) => {
+    moveCommands.forEach((command, i) => {
         const scenario = {
             width: trimmedBoard.width,
             height: trimmedBoard.height,
@@ -158,15 +207,14 @@ export function getMoveOutcomes(trimmedBoard: {
             }))
         }
 
-        // console.time("move commands")
+        console.time("move commands")
         scenario.snakes.forEach(snake => moveSnake(snake, command[snake.id]));
-        // console.timeEnd("move commands")
+        console.timeEnd("move commands")
 
-        // console.time("Resolve board")
+        console.time("Resolve board")
         const snakeStatuses = resolveBoardAndGetSnakeStatuses(scenario as GameBoard);
-        // console.timeEnd("Resolve board")
-        outcomes.push({ gameBoard: scenario, statuses: snakeStatuses })
-
+        console.timeEnd("Resolve board")
+        outcomes[i] = { gameBoard: scenario, statuses: snakeStatuses }
     })
 
     return outcomes as {
@@ -194,6 +242,10 @@ export function getReasonableDirections(snakes: Array<TrimmedSnake>, width?: num
     });
 }
 
+
+
+
+
 export function getMoveCommands(
     directionSets: Array<{ id: string, directions: Direction[] }>,
     index = 0,
@@ -202,8 +254,10 @@ export function getMoveCommands(
     if (index === directionSets.length) { return [current]; }
 
     const currentDirections = directionSets[index];
+
     const moveCommands: Array<Record<string, Direction>> = [];
     for (let i = 0; i < currentDirections.directions.length; i++) {
+
         moveCommands.push(
             ...getMoveCommands(
                 directionSets,
