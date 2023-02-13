@@ -207,9 +207,9 @@ export function getMoveOutcomes(trimmedBoard: {
         scenario.snakes.forEach(snake => moveSnake(snake, command[snake.id]));
         // console.timeEnd("move commands")
 
-        console.time("Resolve board");
+        // console.time("Resolve board");
         const snakeAliveStatuses = resolveBoardAndGetSnakeAliveStatuses(scenario as GameBoard);
-        console.timeEnd("Resolve board");
+        // console.timeEnd("Resolve board");
         outcomes[i] = { gameBoard: scenario, statuses: snakeAliveStatuses }
     })
 
@@ -290,12 +290,11 @@ export function getSurvivorsByMove(outcomes: ReturnType<typeof getMoveOutcomes>,
     outcomes.forEach(outcome => {
         let enemiesAlive = 0;
         let mySnakeAlive = 0;
-
         outcome.statuses.forEach((isAlive, id) => { 
             if (isAlive === false) { return; }
             if (id === mySnakeId) { mySnakeAlive++; }
             else { enemiesAlive++; }
-        })
+        });
         const direction = outcome.gameBoard.snakes.find(snake => snake.id === mySnakeId)!.lastMoved;
         moveSurvivors[direction] = moveSurvivors[direction] || { enemiesAlive: 0, mySnakeAlive: 0 };
         moveSurvivors[direction].enemiesAlive += enemiesAlive;
