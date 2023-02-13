@@ -37,21 +37,8 @@ export function getBackwardsDirection(snake: TrimmedSnake) {
 
 
 
-export function getGridFromBoard(board: Omit<GameBoard, "snakes"> & { snakes: Array<TrimmedSnake> }) {
+export function getEasyAccessMapFromBoard(board: Omit<GameBoard, "snakes"> & { snakes: Array<TrimmedSnake> }) {
     const grid: Record<number, string[]> = {};
-    board.snakes.forEach((snake) => {
-        snake.body.forEach((part, i) => {
-            const { x, y } = part;
-            const label = (i === 0) ? "head" : "body";
-            const key = x + (y * 0.01);
-            const value = `${label}:${snake.id}`;
-            if (grid[key]) {
-                grid[key].push(value);
-            } else {
-                grid[key] = [value];
-            }
-        })
-    });
     board.food.forEach(item => {
         const key = item.x + (item.y * 0.01);
         if (grid[key]) {
@@ -68,18 +55,21 @@ export function getGridFromBoard(board: Omit<GameBoard, "snakes"> & { snakes: Ar
             grid[key] = ["hzrd:"];
         }
     });
-
+    board.snakes.forEach((snake) => {
+        snake.body.forEach((part, i) => {
+            const { x, y } = part;
+            const label = (i === 0) ? "head" : "body";
+            const key = x + (y * 0.01);
+            const value = `${label}:${snake.id}`;
+            if (grid[key]) {
+                grid[key].push(value);
+            } else {
+                grid[key] = [value];
+            }
+        })
+    });
     return grid;
 }
-
-// export function _resolveBoardAndGetSnakeStatuses(board: GameBoard) {
-//     const grid: Record<number, string> = {};
-
-// }
-
-
-
-
 
 
 export function resolveBoardAndGetSnakeStatuses(board: GameBoard) {
@@ -211,7 +201,7 @@ export function getMoveOutcomes(trimmedBoard: {
         scenario.snakes.forEach(snake => moveSnake(snake, command[snake.id]));
         console.timeEnd("move commands")
 
-        console.time("Resolve board")
+        console.time("Resolve board");
         const snakeStatuses = resolveBoardAndGetSnakeStatuses(scenario as GameBoard);
         console.timeEnd("Resolve board")
         outcomes[i] = { gameBoard: scenario, statuses: snakeStatuses }

@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest"
 import { getChosenMove } from "~/routes/snakes/old-faithful/move";
-import { getBackwardsDirection, getGridFromBoard, getMoveCommands, getMoveOutcomes, getReasonableDirections, getSurvivorsByMove, moveSnake, resolveBoardAndGetSnakeStatuses } from "./functions"
+import { getBackwardsDirection, getEasyAccessMapFromBoard, getMoveCommands, getMoveOutcomes, getReasonableDirections, getSurvivorsByMove, moveSnake, resolveBoardAndGetSnakeStatuses } from "./functions"
 
 
 describe("Game engine", () => {
@@ -791,7 +791,7 @@ describe("Grid from Board", () => {
 
     test("just one small snake no others", () => {
 
-        expect(getGridFromBoard({
+        expect(getEasyAccessMapFromBoard({
             height: 11,
             width: 11,
             food: [],
@@ -814,7 +814,7 @@ describe("Grid from Board", () => {
 
     test("Using 10 y value to demonstrate its behavior", () => {
 
-        expect(getGridFromBoard({
+        expect(getEasyAccessMapFromBoard({
             height: 11,
             width: 11,
             food: [],
@@ -856,7 +856,7 @@ describe("Grid from Board", () => {
 
     test("no snakes just food and hazards", () => {
 
-        expect(getGridFromBoard({
+        expect(getEasyAccessMapFromBoard({
             height: 11,
             width: 11,
             food: [
@@ -872,6 +872,37 @@ describe("Grid from Board", () => {
             [0.0]: ["food:", "hzrd:"],
             [2.04]: ["food:"],
             [3.07]: ["hzrd:"],
+        });
+
+    });
+
+    test("all of em", () => {
+
+        expect(getEasyAccessMapFromBoard({
+            height: 11,
+            width: 11,
+            food: [
+                { x: 0, y: 10 }
+            ],
+            hazards: [
+                { x: 0, y: 10 },
+            ],
+            snakes: [
+                {
+                    id: "gs_1",
+                    body: [
+                        { x: 0, y: 10 },
+                        { x: 1, y: 10 },
+                        { x: 2, y: 10 },
+                    ],
+                    health: 100,
+                    squad: ""
+                }
+            ]
+        })).toEqual({
+            [0.1]: ["food:", "hzrd:", "head:gs_1"],
+            [1.1]: ["body:gs_1"],
+            [2.1]: ["body:gs_1"],
         });
 
     });
