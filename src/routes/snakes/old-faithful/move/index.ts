@@ -69,7 +69,7 @@ export function getChosenMove(trimmedBoard: TrimmedBoard, mySnakeId: string) {
         (outcome as any).originalMove = mySnake.lastMoved;
         const keepThisOne = stayAliveChoices.includes(mySnake.lastMoved);
         if (keepThisOne) {
-            const corpsesRemoved = outcome.gameBoard.snakes.filter(snake => outcome.statuses[snake.id].alive === true);
+            const corpsesRemoved = outcome.gameBoard.snakes.filter(snake => outcome.statuses[snake.id] === true);
             outcome.gameBoard.snakes = corpsesRemoved;
         }
         return keepThisOne

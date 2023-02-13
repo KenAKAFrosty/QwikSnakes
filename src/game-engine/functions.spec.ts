@@ -1,11 +1,11 @@
 import { describe, expect, test } from "vitest"
 import { getChosenMove } from "~/routes/snakes/old-faithful/move";
-import { getBackwardsDirection, getEasyAccessMapFromBoard, getMoveCommands, getMoveOutcomes, getReasonableDirections, getSurvivorsByMove, moveSnake, resolveBoardAndGetSnakeStatuses } from "./functions"
+import { getBackwardsDirection, getEasyAccessMapFromBoard, getMoveCommands, getMoveOutcomes, getReasonableDirections, getSurvivorsByMove, moveSnake, resolveBoardAndGetSnakeAliveStatuses } from "./functions"
 
 
 describe("Game engine", () => {
     test("resolve board basic life", () => {
-        expect(resolveBoardAndGetSnakeStatuses({
+        expect(resolveBoardAndGetSnakeAliveStatuses({
             height: 11,
             width: 11,
             snakes: [
@@ -38,13 +38,13 @@ describe("Game engine", () => {
             hazards: []
         }
         )).toEqual({
-            'gs_yjxcD4dGd9yVF6ycGW6bW8gb': { alive: true },
-            'gs_x8HRCtPFT7cHFwwhMWQGWTW4': { alive: true }
+            'gs_yjxcD4dGd9yVF6ycGW6bW8gb': true,
+            'gs_x8HRCtPFT7cHFwwhMWQGWTW4': true
         })
     });
 
     test("resolve board ate own neck", () => {
-        expect(resolveBoardAndGetSnakeStatuses({
+        expect(resolveBoardAndGetSnakeAliveStatuses({
             height: 11,
             width: 11,
             snakes: [
@@ -77,13 +77,13 @@ describe("Game engine", () => {
             hazards: []
         }
         )).toEqual({
-            'gs_yjxcD4dGd9yVF6ycGW6bW8gb': { alive: false },
-            'gs_x8HRCtPFT7cHFwwhMWQGWTW4': { alive: true }
+            'gs_yjxcD4dGd9yVF6ycGW6bW8gb': false,
+            'gs_x8HRCtPFT7cHFwwhMWQGWTW4': true
         });
 
 
 
-        expect(resolveBoardAndGetSnakeStatuses({
+        expect(resolveBoardAndGetSnakeAliveStatuses({
             height: 11,
             width: 11,
             snakes: [
@@ -116,14 +116,14 @@ describe("Game engine", () => {
             hazards: []
         }
         )).toEqual({
-            'gs_yjxcD4dGd9yVF6ycGW6bW8gb': { alive: false },
-            'gs_x8HRCtPFT7cHFwwhMWQGWTW4': { alive: true }
+            'gs_yjxcD4dGd9yVF6ycGW6bW8gb': false,
+            'gs_x8HRCtPFT7cHFwwhMWQGWTW4': true
         });
     });
 
 
     test("resolve board basic out of bounds death", () => {
-        expect(resolveBoardAndGetSnakeStatuses({
+        expect(resolveBoardAndGetSnakeAliveStatuses({
             height: 11,
             width: 11,
             snakes: [
@@ -156,11 +156,11 @@ describe("Game engine", () => {
             hazards: []
         }
         )).toEqual({
-            'gs_yjxcD4dGd9yVF6ycGW6bW8gb': { alive: false },
-            'gs_x8HRCtPFT7cHFwwhMWQGWTW4': { alive: true }
+            'gs_yjxcD4dGd9yVF6ycGW6bW8gb': false,
+            'gs_x8HRCtPFT7cHFwwhMWQGWTW4': true
         })
 
-        expect(resolveBoardAndGetSnakeStatuses({
+        expect(resolveBoardAndGetSnakeAliveStatuses({
             height: 11,
             width: 11,
             snakes: [
@@ -193,14 +193,14 @@ describe("Game engine", () => {
             hazards: []
         }
         )).toEqual({
-            'gs_yjxcD4dGd9yVF6ycGW6bW8gb': { alive: false },
-            'gs_x8HRCtPFT7cHFwwhMWQGWTW4': { alive: false }
+            'gs_yjxcD4dGd9yVF6ycGW6bW8gb': false,
+            'gs_x8HRCtPFT7cHFwwhMWQGWTW4': false
         });
 
     });
 
     test("resolve board health loss / food consumption", () => {
-        expect(resolveBoardAndGetSnakeStatuses({
+        expect(resolveBoardAndGetSnakeAliveStatuses({
             height: 11,
             width: 11,
             snakes: [
@@ -233,12 +233,12 @@ describe("Game engine", () => {
             hazards: []
         }
         )).toEqual({
-            'gs_yjxcD4dGd9yVF6ycGW6bW8gb': { alive: true },
-            'gs_x8HRCtPFT7cHFwwhMWQGWTW4': { alive: false }
+            'gs_yjxcD4dGd9yVF6ycGW6bW8gb': true,
+            'gs_x8HRCtPFT7cHFwwhMWQGWTW4': false
         });
 
 
-        expect(resolveBoardAndGetSnakeStatuses({
+        expect(resolveBoardAndGetSnakeAliveStatuses({
             height: 11,
             width: 11,
             snakes: [
@@ -271,8 +271,8 @@ describe("Game engine", () => {
             hazards: []
         }
         )).toEqual({
-            'gs_yjxcD4dGd9yVF6ycGW6bW8gb': { alive: true },
-            'gs_x8HRCtPFT7cHFwwhMWQGWTW4': { alive: true }
+            'gs_yjxcD4dGd9yVF6ycGW6bW8gb': true,
+            'gs_x8HRCtPFT7cHFwwhMWQGWTW4': true
         })
     })
 });
@@ -354,9 +354,9 @@ describe("Perform move on snake then assess outcome", () => {
         };
 
         moveSnake(board.snakes[0], "left");
-        expect(resolveBoardAndGetSnakeStatuses(board)).toEqual({
-            'gs_yjxcD4dGd9yVF6ycGW6bW8gb': { alive: false },
-            'gs_x8HRCtPFT7cHFwwhMWQGWTW4': { alive: true }
+        expect(resolveBoardAndGetSnakeAliveStatuses(board)).toEqual({
+            'gs_yjxcD4dGd9yVF6ycGW6bW8gb': false,
+            'gs_x8HRCtPFT7cHFwwhMWQGWTW4': true
         })
     });
 })
@@ -564,7 +564,7 @@ describe("Get move outcomes", () => {
                     width: 11
                 },
                 statuses: {
-                    gs_1: { alive: true }
+                    gs_1: true
                 }
             },
             {
@@ -575,7 +575,7 @@ describe("Get move outcomes", () => {
                     width: 11
                 },
                 statuses: {
-                    gs_1: { alive: true }
+                    gs_1: true
                 }
             },
             {
@@ -586,7 +586,7 @@ describe("Get move outcomes", () => {
                     width: 11
                 },
                 statuses: {
-                    gs_1: { alive: true }
+                    gs_1: true
                 }
             }
         ];
@@ -625,7 +625,7 @@ describe("Get move outcomes", () => {
                     width: 11
                 },
                 statuses: {
-                    gs_1: { alive: true }
+                    gs_1: true
                 }
             }
         ];
@@ -671,8 +671,8 @@ describe("Get move outcomes", () => {
                     width: 11
                 },
                 statuses: {
-                    gs_1: { alive: true },
-                    gs_2: { alive: true }
+                    gs_1: true,
+                    gs_2: true
                 }
             }
         ];
@@ -718,8 +718,8 @@ describe("Get move outcomes", () => {
                     width: 11
                 },
                 statuses: {
-                    gs_1: { alive: true },
-                    gs_2: { alive: true }
+                    gs_1: true,
+                    gs_2: true
                 }
             },
             {
@@ -731,8 +731,8 @@ describe("Get move outcomes", () => {
                     width: 11
                 },
                 statuses: {
-                    gs_1: { alive: true },
-                    gs_2: { alive: true }
+                    gs_1: true,
+                    gs_2: true
                 }
             },
         ];
@@ -922,7 +922,7 @@ describe("Grid from Board", () => {
 
 
 
-test.skip("Speed", () => {
+test("Speed", () => {
 
     const testBoard = {
         height: 11,
