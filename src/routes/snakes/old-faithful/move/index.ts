@@ -88,6 +88,7 @@ export function getChosenMove(trimmedBoard: TrimmedBoard, mySnakeId: string) {
         console.log('weird 2.5, this fires?')
         const [enemiesAlive, mySnakeAlive] = newSurvivors.get(outcome.originalMove)!;
         console.log({enemiesAlive, mySnakeAlive})
+        originalMoveDirectionsAndSurvivors[outcome.originalMove] = originalMoveDirectionsAndSurvivors[outcome.originalMove] || [];
         originalMoveDirectionsAndSurvivors[outcome.originalMove]!.push({
             [outcome.originalMove]: {
                 enemiesAlive,
@@ -95,7 +96,7 @@ export function getChosenMove(trimmedBoard: TrimmedBoard, mySnakeId: string) {
             }
         });
     });
-    console.log('numbers dont even matter anymore')
+    
     const originalMoveScores: { [k in Direction]?: number } = {}
     for (const direction in originalMoveDirectionsAndSurvivors) {
         const survivors = originalMoveDirectionsAndSurvivors[direction as Direction];
