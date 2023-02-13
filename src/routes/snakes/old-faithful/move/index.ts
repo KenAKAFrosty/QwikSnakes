@@ -9,7 +9,7 @@ export const onPost = async (event: RequestEvent) => {
         you: Snake
     } = await event.request.json();
 
-    const trimmedBoard = {
+    const _trimmedBoard = {
         width: game.board.width,
         height: game.board.height,
         food: game.board.food,
@@ -23,6 +23,18 @@ export const onPost = async (event: RequestEvent) => {
             }
         })
     }
+    const trimmedBoard = new Map<keyof TrimmedBoard, any>([
+        ["width", game.board.width],
+        ["height", game.board.height],
+        ["food", game.board.food],
+        ["hazards", game.board.hazards],
+        ["snakes", game.board.snakes.map(snake => ({
+            body: snake.body,
+            id: snake.id,
+            health: snake.health,
+            squad: snake.squad
+        }))]
+    ])
     const mySnakeId = game.you.id;
     const chosenMove = getChosenMove(trimmedBoard, mySnakeId);
     event.headers.set("Content-Type", "application/json");
