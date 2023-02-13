@@ -1,7 +1,6 @@
 import { describe, expect, test } from "vitest"
 import { getChosenMove } from "~/routes/snakes/old-faithful/move";
 import {
-    type TrimmedBoard,
     getBackwardsDirection,
     getMoveCommands,
     getMoveOutcomes,
@@ -10,6 +9,7 @@ import {
     moveSnake,
     resolveBoardAndGetSnakeAliveStatuses
 } from "./functions"
+import { Direction, Snake, TrimmedBoard, TrimmedSnake } from "./types";
 
 
 
@@ -22,27 +22,15 @@ describe("Game engine", () => {
             ["snakes", [
                 {
                     id: 'gs_yjxcD4dGd9yVF6ycGW6bW8gb',
-                    name: 'The Snakening Continues',
-                    latency: '128',
                     health: 92,
-                    body: [{ x: 9, y: 9 }, { x: 9, y: 8 }, { x: 9, y: 7 }],
-                    head: { x: 9, y: 9 },
-                    length: 3,
-                    shout: 'AHHHHHHHH I\'M A SNAKE',
+                    body: [[9, 9], [9, 8], [9, 7]],
                     squad: '',
-                    customizations: { color: '#ac7ef4', head: 'beluga', tail: 'mouse' }
                 },
                 {
                     id: 'gs_x8HRCtPFT7cHFwwhMWQGWTW4',
-                    name: 'Hungry Bot',
-                    latency: '1',
                     health: 94,
-                    body: [{ x: 4, y: 4 }, { x: 4, y: 3 }, { x: 3, y: 3 }, { x: 2, y: 3 }],
-                    head: { x: 4, y: 4 },
-                    length: 4,
-                    shout: '',
+                    body: [[4, 4], [4, 3], [3, 3], [2, 3]],
                     squad: '',
-                    customizations: { color: '#00cc00', head: 'alligator', tail: 'alligator' }
                 }
             ]],
             ["hazards", []]
@@ -59,27 +47,15 @@ describe("Game engine", () => {
             ['snakes', [
                 {
                     id: 'gs_yjxcD4dGd9yVF6ycGW6bW8gb',
-                    name: 'The Snakening Continues',
-                    latency: '128',
                     health: 92,
-                    body: [{ x: 9, y: 8 }, { x: 9, y: 8 }, { x: 9, y: 7 }],
-                    head: { x: 9, y: 9 },
-                    length: 3,
-                    shout: 'AHHHHHHHH I\'M A SNAKE',
+                    body: [[9, 8], [9, 8], [9, 7]],
                     squad: '',
-                    customizations: { color: '#ac7ef4', head: 'beluga', tail: 'mouse' }
                 },
                 {
                     id: 'gs_x8HRCtPFT7cHFwwhMWQGWTW4',
-                    name: 'Hungry Bot',
-                    latency: '1',
                     health: 94,
-                    body: [{ x: 4, y: 4 }, { x: 4, y: 3 }, { x: 3, y: 3 }, { x: 2, y: 3 }],
-                    head: { x: 4, y: 4 },
-                    length: 4,
-                    shout: '',
+                    body: [[4, 4], [4, 3], [3, 3], [2, 3]],
                     squad: '',
-                    customizations: { color: '#00cc00', head: 'alligator', tail: 'alligator' }
                 }
             ]],
             ['food', [[10, 2], [5, 5], [3, 2]]],
@@ -89,35 +65,21 @@ describe("Game engine", () => {
             ['gs_x8HRCtPFT7cHFwwhMWQGWTW4', true]
         ]));
 
-
-
         expect(resolveBoardAndGetSnakeAliveStatuses(new Map<keyof TrimmedBoard, any>([
             ['height', 11],
             ['width', 11],
             ['snakes', [
                 {
                     id: 'gs_yjxcD4dGd9yVF6ycGW6bW8gb',
-                    name: 'The Snakening Continues',
-                    latency: '128',
                     health: 92,
-                    body: [{ x: 9, y: 7 }, { x: 9, y: 8 }, { x: 9, y: 7 }],
-                    head: { x: 9, y: 9 },
-                    length: 3,
-                    shout: 'AHHHHHHHH I\'M A SNAKE',
+                    body: [[9, 7], [9, 8], [9, 7]],
                     squad: '',
-                    customizations: { color: '#ac7ef4', head: 'beluga', tail: 'mouse' }
                 },
                 {
                     id: 'gs_x8HRCtPFT7cHFwwhMWQGWTW4',
-                    name: 'Hungry Bot',
-                    latency: '1',
                     health: 94,
-                    body: [{ x: 4, y: 4 }, { x: 4, y: 3 }, { x: 3, y: 3 }, { x: 2, y: 3 }],
-                    head: { x: 4, y: 4 },
-                    length: 4,
-                    shout: '',
+                    body: [[4, 4], [4, 3], [3, 3], [2, 3]],
                     squad: '',
-                    customizations: { color: '#00cc00', head: 'alligator', tail: 'alligator' }
                 }
             ]],
             ['food', [[10, 2], [5, 5], [3, 2]]],
@@ -136,27 +98,15 @@ describe("Game engine", () => {
             ['snakes', [
                 {
                     id: 'gs_yjxcD4dGd9yVF6ycGW6bW8gb',
-                    name: 'The Snakening Continues',
-                    latency: '128',
                     health: 92,
-                    body: [{ x: 9, y: 11 }, { x: 9, y: 10 }, { x: 9, y: 9 }],
-                    head: { x: 9, y: 9 },
-                    length: 3,
-                    shout: 'AHHHHHHHH I\'M A SNAKE',
+                    body: [[9, 11], [9, 10], [9, 9]],
                     squad: '',
-                    customizations: { color: '#ac7ef4', head: 'beluga', tail: 'mouse' }
                 },
                 {
                     id: 'gs_x8HRCtPFT7cHFwwhMWQGWTW4',
-                    name: 'Hungry Bot',
-                    latency: '1',
                     health: 94,
-                    body: [{ x: 4, y: 4 }, { x: 4, y: 3 }, { x: 3, y: 3 }, { x: 2, y: 3 }],
-                    head: { x: 4, y: 4 },
-                    length: 4,
-                    shout: '',
+                    body: [[4, 4], [4, 3], [3, 3], [2, 3]],
                     squad: '',
-                    customizations: { color: '#00cc00', head: 'alligator', tail: 'alligator' }
                 }
             ]],
             ['food', [[10, 2], [5, 5], [3, 2]]],
@@ -172,27 +122,15 @@ describe("Game engine", () => {
             ['snakes', [
                 {
                     id: 'gs_yjxcD4dGd9yVF6ycGW6bW8gb',
-                    name: 'The Snakening Continues',
-                    latency: '128',
                     health: 92,
-                    body: [{ x: 9, y: 11 }, { x: 9, y: 10 }, { x: 9, y: 9 }],
-                    head: { x: 9, y: 9 },
-                    length: 3,
-                    shout: 'AHHHHHHHH I\'M A SNAKE',
+                    body: [[9, 11], [9, 10], [9, 9]],
                     squad: '',
-                    customizations: { color: '#ac7ef4', head: 'beluga', tail: 'mouse' }
                 },
                 {
                     id: 'gs_x8HRCtPFT7cHFwwhMWQGWTW4',
-                    name: 'Hungry Bot',
-                    latency: '1',
                     health: 94,
-                    body: [{ x: 4, y: -1 }, { x: 4, y: 0 }, { x: 4, y: 1 }, { x: 4, y: 2 }],
-                    head: { x: 4, y: 4 },
-                    length: 4,
-                    shout: '',
+                    body: [[4, -1], [4, 0], [4, 1], [4, 2]],
                     squad: '',
-                    customizations: { color: '#00cc00', head: 'alligator', tail: 'alligator' }
                 }
             ]],
             ['food', [[10, 2], [5, 5], [3, 2]]],
@@ -211,27 +149,15 @@ describe("Game engine", () => {
             ['snakes', [
                 {
                     id: 'gs_yjxcD4dGd9yVF6ycGW6bW8gb',
-                    name: 'The Snakening Continues',
-                    latency: '128',
                     health: 92,
-                    body: [{ x: 9, y: 9 }, { x: 9, y: 8 }, { x: 9, y: 7 }],
-                    head: { x: 9, y: 9 },
-                    length: 3,
-                    shout: 'AHHHHHHHH I\'M A SNAKE',
+                    body: [[9, 9], [9, 8], [9, 7]],
                     squad: '',
-                    customizations: { color: '#ac7ef4', head: 'beluga', tail: 'mouse' }
                 },
                 {
                     id: 'gs_x8HRCtPFT7cHFwwhMWQGWTW4',
-                    name: 'Hungry Bot',
-                    latency: '1',
                     health: 1,
-                    body: [{ x: 4, y: 4 }, { x: 4, y: 3 }, { x: 3, y: 3 }, { x: 2, y: 3 }],
-                    head: { x: 4, y: 4 },
-                    length: 4,
-                    shout: '',
+                    body: [[4, 4], [4, 3], [3, 3], [2, 3]],
                     squad: '',
-                    customizations: { color: '#00cc00', head: 'alligator', tail: 'alligator' }
                 }
             ]],
             ['food', [[10, 2], [5, 5], [3, 2]]],
@@ -249,27 +175,15 @@ describe("Game engine", () => {
             ['snakes', [
                 {
                     id: 'gs_yjxcD4dGd9yVF6ycGW6bW8gb',
-                    name: 'The Snakening Continues',
-                    latency: '128',
                     health: 92,
-                    body: [{ x: 9, y: 9 }, { x: 9, y: 8 }, { x: 9, y: 7 }],
-                    head: { x: 9, y: 9 },
-                    length: 3,
-                    shout: 'AHHHHHHHH I\'M A SNAKE',
+                    body: [[9, 9], [9, 8], [9, 7]],
                     squad: '',
-                    customizations: { color: '#ac7ef4', head: 'beluga', tail: 'mouse' }
                 },
                 {
                     id: 'gs_x8HRCtPFT7cHFwwhMWQGWTW4',
-                    name: 'Hungry Bot',
-                    latency: '1',
                     health: 1,
-                    body: [{ x: 4, y: 4 }, { x: 4, y: 3 }, { x: 3, y: 3 }, { x: 2, y: 3 }],
-                    head: { x: 4, y: 4 },
-                    length: 4,
+                    body: [[4, 4], [4, 3], [3, 3], [2, 3]],
                     shout: '',
-                    squad: '',
-                    customizations: { color: '#00cc00', head: 'alligator', tail: 'alligator' }
                 }
             ]],
             ["food", [[10, 2], [4, 4], [3, 2]]],
@@ -286,40 +200,40 @@ describe("Game engine", () => {
 describe("Moving snake", () => {
 
     test("Basic moves - right", () => {
-        const snake: Pick<Snake, "body"> = {
-            body: [{ x: 0, y: 0 }, { x: 0, y: 1 }, { x: 0, y: 2 }]
+        const snake: Pick<TrimmedSnake, "body"> = {
+            body: [[0, 0], [0, 1], [0, 2]]
         }
-        moveSnake(snake as Snake, "right");
-        expect(snake.body).toEqual([{ x: 1, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 1 }])
+        moveSnake(snake as TrimmedSnake, "right");
+        expect(snake.body).toEqual([[1, 0], [0, 0], [0, 1]])
     })
     test("Basic moves - up", () => {
-        const snake: Pick<Snake, "body"> = {
-            body: [{ x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0 }]
+        const snake: Pick<TrimmedSnake, "body"> = {
+            body: [[0, 0], [1, 0], [2, 0]]
         }
-        moveSnake(snake as Snake, "up");
-        expect(snake.body).toEqual([{ x: 0, y: 1 }, { x: 0, y: 0 }, { x: 1, y: 0 }])
+        moveSnake(snake as TrimmedSnake, "up");
+        expect(snake.body).toEqual([[0, 1], [0, 0], [1, 0]])
     })
     test("Basic moves - left", () => {
-        const snake: Pick<Snake, "body"> = {
-            body: [{ x: 3, y: 0 }, { x: 3, y: 1 }, { x: 3, y: 2 }]
+        const snake: Pick<TrimmedSnake, "body"> = {
+            body: [[3, 0], [3, 1], [3, 2]]
         }
-        moveSnake(snake as Snake, "left");
-        expect(snake.body).toEqual([{ x: 2, y: 0 }, { x: 3, y: 0 }, { x: 3, y: 1 }])
+        moveSnake(snake as TrimmedSnake, "left");
+        expect(snake.body).toEqual([[2, 0], [3, 0], [3, 1]])
     })
     test("Basic moves - down", () => {
-        const snake: Pick<Snake, "body"> = {
-            body: [{ x: 3, y: 3 }, { x: 2, y: 3 }, { x: 1, y: 3 }]
+        const snake: Pick<TrimmedSnake, "body"> = {
+            body: [[3, 3], [2, 3], [1, 3]]
         }
-        moveSnake(snake as Snake, "down");
-        expect(snake.body).toEqual([{ x: 3, y: 2 }, { x: 3, y: 3 }, { x: 2, y: 3 }])
+        moveSnake(snake as TrimmedSnake, "down");
+        expect(snake.body).toEqual([[3, 2], [3, 3], [2, 3]])
     })
 
     test("Moving down after just ate food (stacked tail)", () => {
-        const snake: Pick<Snake, "body"> = {
-            body: [{ x: 3, y: 3 }, { x: 2, y: 3 }, { x: 1, y: 3 }, { x: 1, y: 3 }]
+        const snake: Pick<TrimmedSnake, "body"> = {
+            body: [[3, 3], [2, 3], [1, 3], [1, 3]]
         }
-        moveSnake(snake as Snake, "down");
-        expect(snake.body).toEqual([{ x: 3, y: 2 }, { x: 3, y: 3 }, { x: 2, y: 3 }, { x: 1, y: 3 }])
+        moveSnake(snake as TrimmedSnake, "down");
+        expect(snake.body).toEqual([[3, 2], [3, 3], [2, 3], [1, 3]])
     })
 });
 
@@ -331,28 +245,15 @@ describe("Perform move on snake then assess outcome", () => {
             ["snakes", [
                 {
                     id: 'gs_yjxcD4dGd9yVF6ycGW6bW8gb',
-                    name: 'The Snakening Continues',
-                    latency: '128',
                     health: 92,
-
-                    body: [{ x: 0, y: 9 }, { x: 0, y: 8 }, { x: 0, y: 7 }],
-                    head: { x: 0, y: 9 },
-                    length: 3,
-                    shout: 'AHHHHHHHH I\'M A SNAKE',
+                    body: [[0, 9], [0, 8], [0, 7]],
                     squad: '',
-                    customizations: { color: '#ac7ef4', head: 'beluga', tail: 'mouse' }
                 },
                 {
                     id: 'gs_x8HRCtPFT7cHFwwhMWQGWTW4',
-                    name: 'Hungry Bot',
-                    latency: '1',
                     health: 94,
-                    body: [{ x: 4, y: 4 }, { x: 4, y: 3 }, { x: 3, y: 3 }, { x: 2, y: 3 }],
-                    head: { x: 4, y: 4 },
-                    length: 4,
+                    body: [[4, 4], [4, 3], [3, 3], [2, 3]],
                     shout: '',
-                    squad: '',
-                    customizations: { color: '#00cc00', head: 'alligator', tail: 'alligator' }
                 }
             ]],
             ["food", [[10, 2], [4, 4], [3, 2]]],
@@ -370,25 +271,25 @@ describe("Perform move on snake then assess outcome", () => {
 describe("Properly gets backwards direction", () => {
     test("up", () => {
         expect(
-            getBackwardsDirection({ body: [{ x: 0, y: 0 }, { x: 0, y: 1 }, { x: 0, y: 2 }] } as Snake)
+            getBackwardsDirection({ body: [[0, 0], [0, 1], [0, 2]] } as TrimmedSnake)
         ).toEqual("up")
     });
 
     test("down", () => {
         expect(
-            getBackwardsDirection({ body: [{ x: 0, y: 2 }, { x: 0, y: 1 }, { x: 0, y: 0 }] } as Snake)
+            getBackwardsDirection({ body: [[0, 2], [0, 1], [0, 0]] } as TrimmedSnake)
         ).toEqual("down")
     });
 
     test("left", () => {
         expect(
-            getBackwardsDirection({ body: [{ x: 2, y: 0 }, { x: 1, y: 0 }, { x: 0, y: 0 }] } as Snake)
+            getBackwardsDirection({ body: [[2, 0], [1, 0], [0, 0]] } as TrimmedSnake)
         ).toEqual("left")
     });
 
     test("right", () => {
         expect(
-            getBackwardsDirection({ body: [{ x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0 }] } as Snake)
+            getBackwardsDirection({ body: [[0, 0], [1, 0], [2, 0]] } as TrimmedSnake)
         ).toEqual("right")
     });
 });
@@ -400,19 +301,19 @@ describe("Testing directions and move commands calculations", () => {
         const snakes: TrimmedSnake[] = [
             {
                 id: "gs_1",
-                body: [{ x: 0, y: 0 }, { x: 0, y: 1 }, { x: 0, y: 2 }],
+                body: [[0, 0], [0, 1], [0, 2]],
                 health: 100,
                 squad: ""
             },
             {
                 id: "gs_2",
-                body: [{ x: 9, y: 4 }, { x: 9, y: 3 }, { x: 9, y: 2 }],
+                body: [[9, 4], [9, 3], [9, 2]],
                 health: 100,
                 squad: ""
             },
             {
                 id: "gs_3",
-                body: [{ x: 4, y: 9 }, { x: 3, y: 9 }, { x: 2, y: 9 }],
+                body: [[4, 9], [3, 9], [2, 9]],
                 health: 100,
                 squad: ""
             },
@@ -429,19 +330,19 @@ describe("Testing directions and move commands calculations", () => {
         const snakes: TrimmedSnake[] = [
             {
                 id: "gs_1",
-                body: [{ x: 0, y: 0 }, { x: 0, y: 1 }, { x: 0, y: 2 }],
+                body: [[0, 0], [0, 1], [0, 2]],
                 health: 100,
                 squad: ""
             },
             {
                 id: "gs_2",
-                body: [{ x: 9, y: 4 }, { x: 9, y: 3 }, { x: 9, y: 2 }],
+                body: [[9, 4], [9, 3], [9, 2]],
                 health: 100,
                 squad: ""
             },
             {
                 id: "gs_3",
-                body: [{ x: 4, y: 9 }, { x: 3, y: 9 }, { x: 2, y: 9 }],
+                body: [[4, 9], [3, 9], [2, 9]],
                 health: 100,
                 squad: ""
             },
@@ -457,7 +358,7 @@ describe("Testing directions and move commands calculations", () => {
         const snakes: TrimmedSnake[] = [
             {
                 id: "gs_1",
-                body: [{ x: 10, y: 10 }, { x: 10, y: 9 }, { x: 10, y: 8 }],
+                body: [[10, 10], [10, 9], [10, 8]],
                 health: 100,
                 squad: ""
             },
@@ -548,7 +449,7 @@ describe("Get move outcomes", () => {
             ["snakes", [
                 {
                     id: "gs_1",
-                    body: [{ x: 5, y: 5 }, { x: 5, y: 6 }, { x: 5, y: 7 }],
+                    body: [[5, 5], [5, 6], [5, 7]],
                     health: 100,
                     squad: ""
                 }
@@ -563,7 +464,7 @@ describe("Get move outcomes", () => {
                     ["food", []],
                     ["hazards", []],
                     ["snakes", [
-                        { id: "gs_1", body: [{ x: 4, y: 5 }, { x: 5, y: 5 }, { x: 5, y: 6 }], health: 99, squad: "", lastMoved: "left" }
+                        { id: "gs_1", body: [[4, 5], [5, 5], [5, 6]], health: 99, squad: "", lastMoved: "left" }
                     ]]
                 ]),
                 statuses: new Map([
@@ -577,7 +478,7 @@ describe("Get move outcomes", () => {
                     ["food", []],
                     ["hazards", []],
                     ["snakes", [
-                        { id: "gs_1", body: [{ x: 6, y: 5 }, { x: 5, y: 5 }, { x: 5, y: 6 }], health: 99, squad: "", lastMoved: "right" }
+                        { id: "gs_1", body: [[6, 5], [5, 5], [5, 6]], health: 99, squad: "", lastMoved: "right" }
                     ]]
                 ]),
                 statuses: new Map([
@@ -591,7 +492,7 @@ describe("Get move outcomes", () => {
                     ["food", []],
                     ["hazards", []],
                     ["snakes", [
-                        { id: "gs_1", body: [{ x: 5, y: 4 }, { x: 5, y: 5 }, { x: 5, y: 6 }], health: 99, squad: "", lastMoved: "down" }
+                        { id: "gs_1", body: [[5, 4], [5, 5], [5, 6]], health: 99, squad: "", lastMoved: "down" }
                     ]]
                 ]),
                 statuses: new Map([
@@ -612,7 +513,7 @@ describe("Get move outcomes", () => {
             ["snakes", [
                 {
                     id: "gs_1",
-                    body: [{ x: 0, y: 0 }, { x: 0, y: 1 }, { x: 0, y: 2 }],
+                    body: [[0, 0], [0, 1], [0, 2]],
                     health: 100,
                     squad: ""
                 }
@@ -627,7 +528,7 @@ describe("Get move outcomes", () => {
                     ["food", []],
                     ["hazards", []],
                     ["snakes", [
-                        { id: "gs_1", body: [{ x: 1, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 1 }], health: 99, squad: "", lastMoved: "right" }
+                        { id: "gs_1", body: [[1, 0], [0, 0], [0, 1]], health: 99, squad: "", lastMoved: "right" }
                     ]]
                 ]),
                 statuses: new Map([["gs_1", true]])
@@ -646,13 +547,13 @@ describe("Get move outcomes", () => {
             ["snakes", [
                 {
                     id: "gs_1",
-                    body: [{ x: 0, y: 0 }, { x: 0, y: 1 }, { x: 0, y: 2 }],
+                    body: [[0, 0], [0, 1], [0, 2]],
                     health: 100,
                     squad: ""
                 },
                 {
                     id: "gs_2",
-                    body: [{ x: 10, y: 10 }, { x: 10, y: 9 }, { x: 10, y: 8 }],
+                    body: [[10, 10], [10, 9], [10, 8]],
                     health: 100,
                     squad: ""
                 }
@@ -667,8 +568,8 @@ describe("Get move outcomes", () => {
                     ["food", []],
                     ["hazards", []],
                     ["snakes", [
-                        { id: "gs_1", body: [{ x: 1, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 1 }], health: 99, squad: "", lastMoved: "right" },
-                        { id: "gs_2", body: [{ x: 9, y: 10 }, { x: 10, y: 10 }, { x: 10, y: 9 }], health: 99, squad: "", lastMoved: "left" }
+                        { id: "gs_1", body: [[1, 0], [0, 0], [0, 1]], health: 99, squad: "", lastMoved: "right" },
+                        { id: "gs_2", body: [[9, 10], [10, 10], [10, 9]], health: 99, squad: "", lastMoved: "left" }
                     ]]
                 ]),
                 statuses: new Map([
@@ -690,13 +591,13 @@ describe("Get move outcomes", () => {
             ["snakes", [
                 {
                     id: "gs_1",
-                    body: [{ x: 0, y: 0 }, { x: 0, y: 1 }, { x: 0, y: 2 }],
+                    body: [[0, 0], [0, 1], [0, 2]],
                     health: 100,
                     squad: ""
                 },
                 {
                     id: "gs_2",
-                    body: [{ x: 10, y: 8 }, { x: 10, y: 7 }, { x: 10, y: 6 }],
+                    body: [[10, 8], [10, 7], [10, 6]],
                     health: 100,
                     squad: ""
                 }
@@ -711,8 +612,8 @@ describe("Get move outcomes", () => {
                     ["food", []],
                     ["hazards", []],
                     ["snakes", [
-                        { id: "gs_1", body: [{ x: 1, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 1 }], health: 99, squad: "", lastMoved: "right" },
-                        { id: "gs_2", body: [{ x: 9, y: 8 }, { x: 10, y: 8 }, { x: 10, y: 7 }], health: 99, squad: "", lastMoved: "left" }
+                        { id: "gs_1", body: [[1, 0], [0, 0], [0, 1]], health: 99, squad: "", lastMoved: "right" },
+                        { id: "gs_2", body: [[9, 8], [10, 8], [10, 7]], health: 99, squad: "", lastMoved: "left" }
                     ]]
                 ]),
                 statuses: new Map([
@@ -727,8 +628,8 @@ describe("Get move outcomes", () => {
                     ["food", []],
                     ["hazards", []],
                     ["snakes", [
-                        { id: "gs_1", body: [{ x: 1, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 1 }], health: 99, squad: "", lastMoved: "right" },
-                        { id: "gs_2", body: [{ x: 10, y: 9 }, { x: 10, y: 8 }, { x: 10, y: 7 }], health: 99, squad: "", lastMoved: "up" }
+                        { id: "gs_1", body: [[1, 0], [0, 0], [0, 1]], health: 99, squad: "", lastMoved: "right" },
+                        { id: "gs_2", body: [[10, 9], [10, 8], [10, 7]], health: 99, squad: "", lastMoved: "up" }
                     ]]
                 ]),
                 statuses: new Map([
@@ -748,27 +649,15 @@ describe("Get move outcomes", () => {
             ["snakes", [
                 {
                     id: 'gs_ptxF68hPjTwRtvgFmyFM3xbV',
-                    name: 'The Snakening Continues',
-                    latency: '31',
                     health: 93,
-                    body: [{ x: 4, y: 6 }, { x: 4, y: 7 }, { x: 4, y: 8 }, { x: 4, y: 9 }, { x: 4, y: 10 }],
-                    head: { x: 7, y: 2 },
-                    length: 4,
-                    shout: 'AHHHHHHHH I\'M A SNAKE',
+                    body: [[4, 6], [4, 7], [4, 8], [4, 9], [4, 10]],
                     squad: '',
-                    customizations: { color: '#ac7ef4', head: 'beluga', tail: 'mouse' }
                 },
                 {
                     id: 'gs_6G9xhJ8fVvfvRfqQ4XR43SbR',
-                    name: 'Hungry Bot',
-                    latency: '1',
                     health: 93,
-                    body: [{ x: 3, y: 5 }, { x: 4, y: 5 }, { x: 4, y: 4 }, { x: 4, y: 3 }],
-                    head: { x: 4, y: 5 },
-                    length: 4,
-                    shout: '',
+                    body: [[3, 5], [4, 5], [4, 4], [4, 3]],
                     squad: '',
-                    customizations: { color: '#00cc00', head: 'alligator', tail: 'alligator' }
                 }
             ]],
             ["food", [[5, 5], [8, 1]]],
@@ -797,25 +686,25 @@ test("Speed", () => {
                 id: 'gs_hJbrDpT6fMm9SkCGJmt3c4qF',
                 name: 'The Snakening Continues',
                 health: 98,
-                body: [{ x: 4, y: 8 }, { x: 4, y: 9 }, { x: 5, y: 9 }],
+                body: [[4, 8], [4, 9], [5, 9]],
                 squad: '',
             },
             {
                 id: 'gs_qJBgRRyjSqmJDtChfFT3fvC8',
                 health: 100,
-                body: [{ x: 10, y: 6 }, { x: 10, y: 5 }, { x: 9, y: 5 }, { x: 9, y: 5 }],
+                body: [[10, 6], [10, 5], [9, 5], [9, 5]],
                 squad: '',
             },
             {
                 id: 'gs_dMydyR6Tt8ppDkRqHWRpv7R7',
                 health: 98,
-                body: [{ x: 2, y: 6 }, { x: 1, y: 6 }, { x: 1, y: 5 }],
+                body: [[2, 6], [1, 6], [1, 5]],
                 squad: '',
             },
             {
                 id: 'gs_cCG399q6GcFHCV4Dj3bCf93X',
                 health: 100,
-                body: [{ x: 4, y: 0 }, { x: 4, y: 1 }, { x: 5, y: 1 }, { x: 5, y: 1 }],
+                body: [[4, 0], [4, 1], [5, 1], [5, 1]],
                 squad: '',
             }
         ]],

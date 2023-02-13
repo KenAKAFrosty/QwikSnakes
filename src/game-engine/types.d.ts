@@ -34,6 +34,15 @@ type Snake = {
     }
 }
 
-type TrimmedSnake = Pick<Snake, "body" | "id" | "health" | "squad"> & { lastMoved?: Direction }
+type TrimmedSnake = Pick<Snake, "id" | "health" | "squad"> & { body: Array<Coordinates>, lastMoved?: Direction }
+
+export type TrimmedBoard = {
+    width: GameBoard["width"];
+    height: GameBoard["height"];
+    food: GameBoard["food"];
+    hazards: GameBoard["hazards"];
+    snakes: Array<TrimmedSnake>
+}
+export type Coordinates = [number, number]
 
 type Direction = "up" | "down" | "left" | "right"

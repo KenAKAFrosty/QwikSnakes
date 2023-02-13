@@ -1,31 +1,25 @@
-export type TrimmedBoard = {
-    width: GameBoard["width"];
-    height: GameBoard["height"];
-    food: GameBoard["food"];
-    hazards: GameBoard["hazards"];
-    snakes: Array<TrimmedSnake>
-}
-export type Coordinates = [number, number]
+import { Coordinates, Direction, GameBoard, Snake, TrimmedBoard, TrimmedSnake } from "./types";
+
 
 export function moveSnake(snake: TrimmedSnake, direction: "up" | "down" | "left" | "right") {
     const body = snake.body;
     for (let i = body.length - 1; i >= 0; i--) {
         if (i !== 0) {
-            body[i].x = body[i - 1].x;
-            body[i].y = body[i - 1].y;
+            body[i][0] = body[i - 1][0];
+            body[i][1] = body[i - 1][1];
         } else {
             switch (direction) {
                 case "up":
-                    body[i].y++;
+                    body[i][1]++;
                     break;
                 case "down":
-                    body[i].y--;
+                    body[i][1]--;
                     break;
                 case "left":
-                    body[i].x--;
+                    body[i][0]--;
                     break;
                 case "right":
-                    body[i].x++;
+                    body[i][0]++;
                     break;
             }
         }
@@ -37,11 +31,11 @@ export function moveSnake(snake: TrimmedSnake, direction: "up" | "down" | "left"
 export function getBackwardsDirection(snake: TrimmedSnake) {
     const head = snake.body[0];
     const second = snake.body[1];
-    if (head.x === second.x) {
-        if (head.y > second.y) { return "down" }
+    if (head[0] === second[0]) {
+        if (head[1] > second[1]) { return "down" }
         return "up"
     }
-    if (head.x > second.x) { return "left" }
+    if (head[0] > second[0]) { return "left" }
     return "right"
 }
 
@@ -76,37 +70,35 @@ export function resolveBoardAndGetSnakeAliveStatuses(board: Map<keyof GameBoard,
             processCollisionCheck(snake, otherSnake, snakeAliveStatuses);
             if (snakeAliveStatuses.get(id) === false) { break; }
         }
-
     });
     return snakeAliveStatuses
 }
 
 export function landedOnFood(snake: TrimmedSnake, board: Map<keyof GameBoard, any>) {
-    const { x, y } = snake.body[0];
-    const foodIndex = board.get("food").findIndex((food: Coordinates) => food[0] === x && food[1] === y);
-    return foodIndex > -1
+    return (board.get("food") as Coordinates[]).some(food => food[0] === snake.body[0][0] && food[1] === snake.body[0][1]);
 }
 
 export function isOutOfBounds(snake: TrimmedSnake, board: Map<keyof GameBoard, any>) {
-    const { x, y } = snake.body[0];
-    return x < 0 || x >= board.get("width") || y < 0 || y >= board.get("height")
+    return snake.body[0][0] < 0 ||
+        snake.body[0][0] >= board.get("width") ||
+        snake.body[0][1] < 0 ||
+        snake.body[0][1] >= board.get("height")
 }
 
 export function isCollidedWithSelf(snake: TrimmedSnake) {
-    const { x, y } = snake.body[0];
     for (let i = 1; i < snake.body.length; i++) {
         const bodyPart = snake.body[i];
-        if (x === bodyPart.x && y === bodyPart.y) { return true }
+        if (snake.body[0][0] === bodyPart[0] && snake.body[0][1] === bodyPart[1]) { return true }
     }
     return false;
 }
 
-export function processCollisionCheck(snake: TrimmedSnake, otherSnake: Snake, snakeAliveStatuses: Map<string, boolean>) {
+export function processCollisionCheck(snake: TrimmedSnake, otherSnake: TrimmedSnake, snakeAliveStatuses: Map<string, boolean>) {
     const snakeId = snake.id;
     const otherSnakeId = otherSnake.id;
-    const { x, y } = snake.body[0];
-    const otherHead = otherSnake.body[0];
-    if (x === otherHead.x && y === otherHead.y) {
+    const snakeHead = snake.body[0];
+    const otherSnakeHead = otherSnake.body[0];
+    if (snakeHead[0] === otherSnakeHead[0] && snakeHead[1] === otherSnakeHead[1]) {
         if (snake.body.length === otherSnake.body.length) {
             snakeAliveStatuses.set(snakeId, false);
             snakeAliveStatuses.set(otherSnakeId, false);
@@ -123,8 +115,8 @@ export function processCollisionCheck(snake: TrimmedSnake, otherSnake: Snake, sn
     }
 
     for (let i = otherSnake.body.length - 1; i >= 0; i--) {
-        const bodyPart = otherSnake.body[i];
-        if (x === bodyPart.x && y === bodyPart.y) {
+        const otherSnakeBodyPart = otherSnake.body[i];
+        if (snakeHead[0] === otherSnakeBodyPart[0] && snakeHead[1] === otherSnakeBodyPart[1]) {
             snakeAliveStatuses.set(snakeId, false);
             snakeAliveStatuses.set(otherSnakeId, true);
             return
@@ -161,7 +153,7 @@ export function getMoveOutcomes(trimmedBoard: Map<keyof TrimmedBoard, any>) {
             ["hazards", trimmedBoard.get("hazards").map((hazard: Coordinates) => [hazard[0], hazard[1]])],
             ["snakes", trimmedBoard.get("snakes").map((snake: TrimmedSnake) => moveSnake({
                 id: snake.id,
-                body: snake.body.map(bodyPart => ({ x: bodyPart.x, y: bodyPart.y })),
+                body: snake.body.map(bodyPart => [bodyPart[0], bodyPart[1]]),
                 health: snake.health,
                 squad: snake.squad,
             },
@@ -183,11 +175,10 @@ export function getReasonableDirections(snakes: Array<TrimmedSnake>, width?: num
     return snakes.map(snake => {
         const invalidDirections: Direction[] = [getBackwardsDirection(snake)];
         if (width && height) {
-            const { x, y } = snake.body[0];
-            if (x === 0) { invalidDirections.push("left") }
-            if (x === width - 1) { invalidDirections.push("right") }
-            if (y === 0) { invalidDirections.push("down") }
-            if (y === height - 1) { invalidDirections.push("up") }
+            if (snake.body[0][0] === 0) { invalidDirections.push("left") }
+            if (snake.body[0][0] === width - 1) { invalidDirections.push("right") }
+            if (snake.body[0][1] === 0) { invalidDirections.push("down") }
+            if (snake.body[0][1] === height - 1) { invalidDirections.push("up") }
         }
         return {
             id: snake.id,

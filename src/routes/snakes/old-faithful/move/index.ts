@@ -1,4 +1,5 @@
 import { type RequestEvent } from "@builder.io/qwik-city";
+import { Direction, Game, GameBoard, Snake, TrimmedBoard, TrimmedSnake } from "~/game-engine/types";
 import { getMoveOutcomes, getSurvivorsByMove } from "../../../../game-engine/functions";
 
 export const onPost = async (event: RequestEvent) => {
@@ -12,10 +13,10 @@ export const onPost = async (event: RequestEvent) => {
     const trimmedBoard = new Map<keyof TrimmedBoard, any>([
         ["width", game.board.width],
         ["height", game.board.height],
-        ["food", game.board.food],
-        ["hazards", game.board.hazards],
+        ["food", game.board.food.map(food => [food.x, food.y])],
+        ["hazards", game.board.hazards.map(hazard => [hazard.x, hazard.y])],
         ["snakes", game.board.snakes.map(snake => ({
-            body: snake.body,
+            body: snake.body.map(bodyPart => [bodyPart.x, bodyPart.y]),
             id: snake.id,
             health: snake.health,
             squad: snake.squad
@@ -30,17 +31,6 @@ export const onPost = async (event: RequestEvent) => {
     })))
 }
 
-
-
-
-
-type TrimmedBoard = {
-    width: number;
-    height: number;
-    food: Array<{ x: number, y: number }>;
-    hazards: Array<{ x: number, y: number }>;
-    snakes: Array<TrimmedSnake>;
-}
 export function getChosenMove(trimmedBoard: Map<keyof TrimmedBoard, any>, mySnakeId: string) {
     console.time("Get move outcomes")
     const outcomes = getMoveOutcomes(trimmedBoard);
