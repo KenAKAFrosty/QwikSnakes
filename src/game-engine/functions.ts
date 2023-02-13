@@ -206,9 +206,9 @@ export function getMoveOutcomes(trimmedBoard: {
         scenario.snakes.forEach(snake => moveSnake(snake, command[snake.id]));
         // console.timeEnd("move commands")
 
-        console.time("Resolve board");
+        // console.time("Resolve board");
         const snakeAliveStatuses = resolveBoardAndGetSnakeAliveStatuses(scenario as GameBoard);
-        console.timeEnd("Resolve board");
+        // console.timeEnd("Resolve board");
         outcomes[i] = { gameBoard: scenario, statuses: snakeAliveStatuses }
     })
 

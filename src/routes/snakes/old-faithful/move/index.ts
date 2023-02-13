@@ -44,15 +44,15 @@ type TrimmedBoard = {
     snakes: Array<TrimmedSnake>
 }
 export function getChosenMove(trimmedBoard: TrimmedBoard, mySnakeId: string) { 
-    console.time("get move outcomes")
+    // console.time("get move outcomes")
     const outcomes = getMoveOutcomes(trimmedBoard);
-    console.timeEnd("get move outcomes")
+    // console.timeEnd("get move outcomes")
 
-    console.time("get survivors by move")
+    // console.time("get survivors by move")
     const moveSurvivors = getSurvivorsByMove(outcomes, mySnakeId);
-    console.timeEnd("get survivors by move")
+    // console.timeEnd("get survivors by move")
 
-    console.time("get stay alive choices")
+    // console.time("get stay alive choices")
     const maxMySnakeAlive = Math.max(...Object.values(moveSurvivors).map(move => move.mySnakeAlive));
     const stayAliveChoices: string[] = [];
     for (const direction in moveSurvivors) {
@@ -60,10 +60,10 @@ export function getChosenMove(trimmedBoard: TrimmedBoard, mySnakeId: string) {
             stayAliveChoices.push(direction);
         }
     }
-    console.timeEnd("get stay alive choices")
+    // console.timeEnd("get stay alive choices")
 
     //DOUBLE DUTY - This is filtering but we're also mutating the gameBoard to remove dead snakes
-    console.time("Filtering outcomes");
+    // console.time("Filtering outcomes");
     const stillAliveOutcomes = outcomes.filter(outcome => {
         const mySnake = outcome.gameBoard.snakes.find(snake => snake.id === mySnakeId)!;
         (outcome as any).originalMove = mySnake.lastMoved;
@@ -74,7 +74,7 @@ export function getChosenMove(trimmedBoard: TrimmedBoard, mySnakeId: string) {
         }
         return keepThisOne
     }) as Array<ReturnType<typeof getMoveOutcomes>[number] & { originalMove: Direction }>
-    console.timeEnd("Filtering outcomes");
+    // console.timeEnd("Filtering outcomes");
 
     const originalMoveDirectionsAndSurvivors: {
         [key in Direction]?: Array<Record<string, {
@@ -83,7 +83,7 @@ export function getChosenMove(trimmedBoard: TrimmedBoard, mySnakeId: string) {
         }>>
     } = {}
 
-    console.time("second turn of getting move outcomes")
+    // console.time("second turn of getting move outcomes")
     stillAliveOutcomes.forEach(outcome => {
         if (!originalMoveDirectionsAndSurvivors[outcome.originalMove]) {
             originalMoveDirectionsAndSurvivors[outcome.originalMove] = [];
@@ -92,9 +92,9 @@ export function getChosenMove(trimmedBoard: TrimmedBoard, mySnakeId: string) {
         const newSurvivors = getSurvivorsByMove(newSetOfOutcomes, mySnakeId);
         originalMoveDirectionsAndSurvivors[outcome.originalMove]!.push(newSurvivors);
     });
-    console.timeEnd("second turn of getting move outcomes")
+    // console.timeEnd("second turn of getting move outcomes")
 
-    console.time("calculating move scores")
+    // console.time("calculating move scores")
     const originalMoveScores: { [k in Direction]?: number } = {}
     for (const direction in originalMoveDirectionsAndSurvivors) {
         const survivors = originalMoveDirectionsAndSurvivors[direction as Direction];
@@ -112,9 +112,9 @@ export function getChosenMove(trimmedBoard: TrimmedBoard, mySnakeId: string) {
         });
         originalMoveScores[direction as Direction] = score;
     }
-    console.timeEnd("calculating move scores")
+    // console.timeEnd("calculating move scores")
 
-    console.time("final calculations")
+    // console.time("final calculations")
     const maxEnemiesAlive = Math.max(...Object.values(moveSurvivors).map(move => move.enemiesAlive));
     for (const direction of stayAliveChoices) {
         const { enemiesAlive } = moveSurvivors[direction as Direction];
@@ -126,7 +126,7 @@ export function getChosenMove(trimmedBoard: TrimmedBoard, mySnakeId: string) {
     const bestScore = Math.max(...Object.values(originalMoveScores));
     const bestMoves = Object.keys(originalMoveScores).filter(move => originalMoveScores[move as Direction] === bestScore);
     const chosenMove = bestMoves[Math.floor(Math.random() * bestMoves.length)] as Direction;
-    console.timeEnd("final calculations")
+    // console.timeEnd("final calculations")
     // console.log({ turn: game.turn, moveSurvivors, originalMoveScores, bestMoves, stayAliveChoices })
     return chosenMove;
 }
