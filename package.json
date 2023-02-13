@@ -40,6 +40,6 @@
     "vercel": "^28.4.17",
     "vite": "4.1.1",
     "vite-tsconfig-paths": "3.5.0",
-    "vitest": "^0.25.0"
+    "vitest": "^0.25.8"
   }
 }
