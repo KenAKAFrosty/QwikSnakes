@@ -179,14 +179,9 @@ export function getMoveOutcomes(trimmedBoard: {
     hazards: GameBoard["hazards"];
     snakes: Array<TrimmedSnake>
 }) {
-    // console.time("reasonable directions")
     const reasonableDirections = getReasonableDirections(trimmedBoard.snakes, trimmedBoard.width, trimmedBoard.height);
-    // console.timeEnd("reasonable directions")
-
-    // console.time("get move commands")
     const moveCommands = getMoveCommands(reasonableDirections);
-    // console.timeEnd("get move commands")
-
+    
     const outcomes: Array<{ gameBoard: typeof trimmedBoard, statuses: ReturnType<typeof resolveBoardAndGetSnakeAliveStatuses> }> = [];
 
     moveCommands.forEach((command, i) => {
@@ -202,14 +197,8 @@ export function getMoveOutcomes(trimmedBoard: {
                 squad: snake.squad,
             }))
         }
-
-        // console.time("move commands")
         scenario.snakes.forEach(snake => moveSnake(snake, command[snake.id]));
-        // console.timeEnd("move commands")
-
-        // console.time("Resolve board");
         const snakeAliveStatuses = resolveBoardAndGetSnakeAliveStatuses(scenario as GameBoard);
-        // console.timeEnd("Resolve board");
         outcomes[i] = { gameBoard: scenario, statuses: snakeAliveStatuses }
     })
 
@@ -288,10 +277,8 @@ This is the simple version with just two arrays for an easy mental map of what i
  * Return a map of directions to a tuple of [enemiesAlive, mySnakeAlive]
  */
 export function getSurvivorsByMove(outcomes: ReturnType<typeof getMoveOutcomes>, mySnakeId: string) {
-    // const moveSurvivors: Record<string, { enemiesAlive: number, mySnakeAlive: number }> = {};
-
     //tuple has [0] position for enemiesAlive, [1] position for mySnakeAlive
-    const _moveSurvivors = new Map<string, [number, number]>();
+    const moveSurvivors = new Map<string, [number, number]>();
 
     outcomes.forEach(outcome => {
         let enemiesAlive = 0;
@@ -302,10 +289,11 @@ export function getSurvivorsByMove(outcomes: ReturnType<typeof getMoveOutcomes>,
             else { enemiesAlive++; }
         });
         const direction = outcome.gameBoard.snakes.find(snake => snake.id === mySnakeId)!.lastMoved;
-        const currentTuple = _moveSurvivors.get(direction) || [0, 0];
+        const currentTuple = moveSurvivors.get(direction) || [0, 0];
         currentTuple[0] += enemiesAlive;
         currentTuple[1] += mySnakeAlive;
-        _moveSurvivors.set(direction, currentTuple);
+        moveSurvivors.set(direction, currentTuple);
     });
-    return _moveSurvivors;
+
+    return moveSurvivors;
 }
