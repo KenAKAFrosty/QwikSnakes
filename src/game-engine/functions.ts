@@ -131,20 +131,20 @@ export function processCollisionCheck(snake: TrimmedSnake, otherSnake: TrimmedSn
 
 
 export function getMoveOutcomes(trimmedBoard: Map<keyof TrimmedBoard, any>) {
-    console.time("1")
+    // console.time("1")
     const reasonableDirections = getReasonableDirections(
         trimmedBoard.get("snakes") as TrimmedSnake[],
         trimmedBoard.get("width") as number,
         trimmedBoard.get("height") as number
     );
-    console.timeEnd("1")
-    console.time("2")
+    // console.timeEnd("1")
+    // console.time("2")
     const moveCommands = getMoveCommands(reasonableDirections);
-    console.timeEnd("2")
+    // console.timeEnd("2")
 
     // const outcomes: Array<{ gameBoard: Map<keyof TrimmedBoard, any>, statuses: ReturnType<typeof resolveBoardAndGetSnakeAliveStatuses> }> = [];
 
-    console.time("3")
+    // console.time("3")
     const outcomes = moveCommands.map((command, i) => {
         const scenario = new Map<keyof TrimmedBoard, any>([
             ["width", trimmedBoard.get("width")],
@@ -162,7 +162,7 @@ export function getMoveOutcomes(trimmedBoard: Map<keyof TrimmedBoard, any>) {
         ]);
         return { gameBoard: scenario, statuses: resolveBoardAndGetSnakeAliveStatuses(scenario) }
     })
-    console.timeEnd("3")
+    // console.timeEnd("3")
 
     return outcomes as {
         gameBoard: Map<keyof TrimmedBoard, any>;

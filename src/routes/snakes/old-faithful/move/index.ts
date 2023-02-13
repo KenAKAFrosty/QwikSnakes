@@ -32,26 +32,26 @@ export const onPost = async (event: RequestEvent) => {
 }
 
 export function getChosenMove(trimmedBoard: Map<keyof TrimmedBoard, any>, mySnakeId: string) {
-    console.time("Get move outcomes")
+    // console.time("Get move outcomes")
     const outcomes = getMoveOutcomes(trimmedBoard);
-    console.timeEnd("Get move outcomes")
+    // console.timeEnd("Get move outcomes")
 
-    console.time("move survivors")
+    // console.time("move survivors")
     const moveSurvivors = getSurvivorsByMove(outcomes, mySnakeId);
-    console.timeEnd("move survivors")
+    // console.timeEnd("move survivors")
 
 
-    console.time("stay alive choices")
+    // console.time("stay alive choices")
     const maxMySnakeAlive = Math.max(...Array.from(moveSurvivors.values()).map(tuple => tuple[1]));
     const stayAliveChoices: string[] = [];
     moveSurvivors.forEach((survivors, direction) => {
         if (survivors[1] === maxMySnakeAlive) { stayAliveChoices.push(direction); }
     });
-    console.timeEnd("stay alive choices")
+    // console.timeEnd("stay alive choices")
 
 
     //DOUBLE DUTY - This is filtering but we're also mutating the gameBoard to remove dead snakes
-    console.time("still alive outcomes")
+    // console.time("still alive outcomes")
     const stillAliveOutcomes = outcomes.filter(outcome => {
         const mySnake = outcome.gameBoard.get("snakes").find((snake: TrimmedSnake) => snake.id === mySnakeId)!;
         (outcome as any).originalMove = mySnake.lastMoved;
@@ -62,7 +62,7 @@ export function getChosenMove(trimmedBoard: Map<keyof TrimmedBoard, any>, mySnak
         }
         return keepThisOne
     }) as Array<ReturnType<typeof getMoveOutcomes>[number] & { originalMove: Direction }>
-    console.timeEnd("still alive outcomes")
+    // console.timeEnd("still alive outcomes")
 
     const originalMoveDirectionsAndSurvivors: {
         [key in Direction]?: Array<Record<string, {
@@ -71,14 +71,14 @@ export function getChosenMove(trimmedBoard: Map<keyof TrimmedBoard, any>, mySnak
         }>>
     } = {}
 
-    console.time("Round 2 of outcomes")
+    // console.time("Round 2 of outcomes")
     stillAliveOutcomes.forEach(outcome => {
-        console.time("Round 2 of outcomes 2")
+        // console.time("Round 2 of outcomes 2")
         if (!originalMoveDirectionsAndSurvivors[outcome.originalMove]) {
             originalMoveDirectionsAndSurvivors[outcome.originalMove] = [];
         }
         const newSetOfOutcomes = getMoveOutcomes(outcome.gameBoard);
-        console.timeEnd("Round 2 of outcomes 2")
+        // console.timeEnd("Round 2 of outcomes 2")
 
         const newSurvivors = getSurvivorsByMove(newSetOfOutcomes, mySnakeId);
 
@@ -94,9 +94,9 @@ export function getChosenMove(trimmedBoard: Map<keyof TrimmedBoard, any>, mySnak
             }
         });
     });
-    console.timeEnd("Round 2 of outcomes")
+    // console.timeEnd("Round 2 of outcomes")
 
-    console.time("Survivor calculations/scoring")
+    // console.time("Survivor calculations/scoring")
     const originalMoveScores: { [k in Direction]?: number } = {}
     for (const direction in originalMoveDirectionsAndSurvivors) {
         const survivors = originalMoveDirectionsAndSurvivors[direction as Direction];
@@ -114,9 +114,9 @@ export function getChosenMove(trimmedBoard: Map<keyof TrimmedBoard, any>, mySnak
         });
         originalMoveScores[direction as Direction] = score;
     }
-    console.timeEnd("Survivor calculations/scoring")
+    // console.timeEnd("Survivor calculations/scoring")
 
-    console.time("Final scoring, choosing move")
+    // console.time("Final scoring, choosing move")
     const maxEnemiesAlive = Math.max(...Array.from(moveSurvivors.values()).map(tuple => tuple[0]));
     for (const direction of stayAliveChoices) {
         const [enemiesAlive] = moveSurvivors.get(direction)!;
@@ -128,6 +128,6 @@ export function getChosenMove(trimmedBoard: Map<keyof TrimmedBoard, any>, mySnak
     const bestScore = Math.max(...Object.values(originalMoveScores));
     const bestMoves = Object.keys(originalMoveScores).filter(move => originalMoveScores[move as Direction] === bestScore);
     const chosenMove = bestMoves[Math.floor(Math.random() * bestMoves.length)] as Direction;
-    console.timeEnd("Final scoring, choosing move")
+    // console.timeEnd("Final scoring, choosing move")
     return chosenMove;
 }
