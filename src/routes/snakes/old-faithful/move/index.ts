@@ -9,20 +9,6 @@ export const onPost = async (event: RequestEvent) => {
         you: Snake
     } = await event.request.json();
 
-    const _trimmedBoard = {
-        width: game.board.width,
-        height: game.board.height,
-        food: game.board.food,
-        hazards: game.board.hazards,
-        snakes: game.board.snakes.map(snake => {
-            return {
-                body: snake.body,
-                id: snake.id,
-                health: snake.health,
-                squad: snake.squad
-            }
-        })
-    }
     const trimmedBoard = new Map<keyof TrimmedBoard, any>([
         ["width", game.board.width],
         ["height", game.board.height],
@@ -43,7 +29,6 @@ export const onPost = async (event: RequestEvent) => {
         shout: "I HAVE NO MOUTH BUT I MUST SCREAM"
     })))
 }
-
 
 
 
