@@ -73,16 +73,17 @@ export function getEasyAccessMapFromBoard(board: Omit<GameBoard, "snakes"> & { s
 
 
 export function resolveBoardAndGetSnakeAliveStatuses(board: GameBoard) {
-    const snakeAliveStatuses: Record<string, boolean> = {};
+    // const snakeAliveStatuses: Record<string, boolean> = {};
+    const _snakeAliveStatuses = new Map<string, boolean>();
     board.snakes.forEach((snake) => {
         const id = snake.id;
-        if (snakeAliveStatuses[id] === false) { return }
+        if (_snakeAliveStatuses.get(id) === false) { return }
         if (isOutOfBounds(snake, board)) {
-            snakeAliveStatuses[id] = false;
+            _snakeAliveStatuses.set(id, false);
             return;
         }
         if (isCollidedWithSelf(snake)) {
-            snakeAliveStatuses[id] = false;
+            _snakeAliveStatuses.set(id, false);
             return;
         }
         snake.health -= 1; //add hazards later
@@ -91,27 +92,27 @@ export function resolveBoardAndGetSnakeAliveStatuses(board: GameBoard) {
             snake.body.push(snake.body[snake.body.length - 1])
         }
         if (snake.health <= 0) {
-            snakeAliveStatuses[id] = false;
+            _snakeAliveStatuses.set(id, false);
             return;
         }
-        
 
-        snakeAliveStatuses[id] = true;
+
+        _snakeAliveStatuses.set(id, true);
 
         for (let i = 0; i < board.snakes.length; i++) {
             const otherSnake = board.snakes[i];
             if (id === otherSnake.id) { continue; }
-            if (snakeAliveStatuses[otherSnake.id] === false) { continue; }
+            if (_snakeAliveStatuses.get(otherSnake.id) === false) { continue; }
             // console.time("processCollisionCheck")
             const collisionResult = processCollisionCheck(snake, otherSnake);
             // console.timeEnd("processCollisionCheck")
-            snakeAliveStatuses[id] = collisionResult[id];
-            snakeAliveStatuses[otherSnake.id] = collisionResult[otherSnake.id];
-            if (snakeAliveStatuses[id] === false) { break; }
+            _snakeAliveStatuses.set(id, collisionResult[id]);
+            _snakeAliveStatuses.set(otherSnake.id, collisionResult[otherSnake.id]);
+            if (_snakeAliveStatuses.get(id) === false) { break; }
         }
 
     });
-    return snakeAliveStatuses
+    return _snakeAliveStatuses
 }
 
 export function landedOnFood(snake: Snake, board: GameBoard) {
@@ -206,9 +207,9 @@ export function getMoveOutcomes(trimmedBoard: {
         scenario.snakes.forEach(snake => moveSnake(snake, command[snake.id]));
         // console.timeEnd("move commands")
 
-        // console.time("Resolve board");
+        console.time("Resolve board");
         const snakeAliveStatuses = resolveBoardAndGetSnakeAliveStatuses(scenario as GameBoard);
-        // console.timeEnd("Resolve board");
+        console.timeEnd("Resolve board");
         outcomes[i] = { gameBoard: scenario, statuses: snakeAliveStatuses }
     })
 
@@ -221,8 +222,7 @@ export function getMoveOutcomes(trimmedBoard: {
 export function getReasonableDirections(snakes: Array<TrimmedSnake>, width?: number, height?: number) {
     const validDirections: Direction[] = ["left", "right", "up", "down"];
     return snakes.map(snake => {
-        const invalidDirections: Direction[] = [];
-        invalidDirections.push(getBackwardsDirection(snake));
+        const invalidDirections: Direction[] = [getBackwardsDirection(snake)];
         if (width && height) {
             const { x, y } = snake.body[0];
             if (x === 0) { invalidDirections.push("left") }
@@ -236,8 +236,6 @@ export function getReasonableDirections(snakes: Array<TrimmedSnake>, width?: num
         }
     });
 }
-
-
 
 
 
@@ -292,12 +290,12 @@ export function getSurvivorsByMove(outcomes: ReturnType<typeof getMoveOutcomes>,
     outcomes.forEach(outcome => {
         let enemiesAlive = 0;
         let mySnakeAlive = 0;
-        for (const id in outcome.statuses) {
-            const isAlive = outcome.statuses[id] === true;
-            if (isAlive === false) { continue; }
+
+        outcome.statuses.forEach((isAlive, id) => { 
+            if (isAlive === false) { return; }
             if (id === mySnakeId) { mySnakeAlive++; }
             else { enemiesAlive++; }
-        }
+        })
         const direction = outcome.gameBoard.snakes.find(snake => snake.id === mySnakeId)!.lastMoved;
         moveSurvivors[direction] = moveSurvivors[direction] || { enemiesAlive: 0, mySnakeAlive: 0 };
         moveSurvivors[direction].enemiesAlive += enemiesAlive;

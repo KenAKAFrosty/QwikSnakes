@@ -36,14 +36,14 @@ export const onPost = async (event: RequestEvent) => {
 
 
 
-type TrimmedBoard = { 
+type TrimmedBoard = {
     width: number;
     height: number;
     food: Array<{ x: number, y: number }>;
     hazards: Array<{ x: number, y: number }>;
     snakes: Array<TrimmedSnake>
 }
-export function getChosenMove(trimmedBoard: TrimmedBoard, mySnakeId: string) { 
+export function getChosenMove(trimmedBoard: TrimmedBoard, mySnakeId: string) {
     // console.time("get move outcomes")
     const outcomes = getMoveOutcomes(trimmedBoard);
     // console.timeEnd("get move outcomes")
@@ -69,7 +69,7 @@ export function getChosenMove(trimmedBoard: TrimmedBoard, mySnakeId: string) {
         (outcome as any).originalMove = mySnake.lastMoved;
         const keepThisOne = stayAliveChoices.includes(mySnake.lastMoved);
         if (keepThisOne) {
-            const corpsesRemoved = outcome.gameBoard.snakes.filter(snake => outcome.statuses[snake.id] === true);
+            const corpsesRemoved = outcome.gameBoard.snakes.filter(snake => outcome.statuses.get(snake.id) === true);
             outcome.gameBoard.snakes = corpsesRemoved;
         }
         return keepThisOne

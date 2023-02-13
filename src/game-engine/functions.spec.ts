@@ -37,10 +37,10 @@ describe("Game engine", () => {
             food: [{ x: 10, y: 2 }, { x: 5, y: 5 }, { x: 3, y: 2 }],
             hazards: []
         }
-        )).toEqual({
-            'gs_yjxcD4dGd9yVF6ycGW6bW8gb': true,
-            'gs_x8HRCtPFT7cHFwwhMWQGWTW4': true
-        })
+        )).toEqual(new Map([
+            ['gs_yjxcD4dGd9yVF6ycGW6bW8gb', true],
+            ['gs_x8HRCtPFT7cHFwwhMWQGWTW4', true]
+        ]))
     });
 
     test("resolve board ate own neck", () => {
@@ -76,10 +76,10 @@ describe("Game engine", () => {
             food: [{ x: 10, y: 2 }, { x: 5, y: 5 }, { x: 3, y: 2 }],
             hazards: []
         }
-        )).toEqual({
-            'gs_yjxcD4dGd9yVF6ycGW6bW8gb': false,
-            'gs_x8HRCtPFT7cHFwwhMWQGWTW4': true
-        });
+        )).toEqual(new Map([
+            ['gs_yjxcD4dGd9yVF6ycGW6bW8gb', false],
+            ['gs_x8HRCtPFT7cHFwwhMWQGWTW4', true]
+        ]));
 
 
 
@@ -115,10 +115,10 @@ describe("Game engine", () => {
             food: [{ x: 10, y: 2 }, { x: 5, y: 5 }, { x: 3, y: 2 }],
             hazards: []
         }
-        )).toEqual({
-            'gs_yjxcD4dGd9yVF6ycGW6bW8gb': false,
-            'gs_x8HRCtPFT7cHFwwhMWQGWTW4': true
-        });
+        )).toEqual(new Map([
+            ['gs_yjxcD4dGd9yVF6ycGW6bW8gb', false],
+            ['gs_x8HRCtPFT7cHFwwhMWQGWTW4', true]
+        ]));
     });
 
 
@@ -155,10 +155,10 @@ describe("Game engine", () => {
             food: [{ x: 10, y: 2 }, { x: 5, y: 5 }, { x: 3, y: 2 }],
             hazards: []
         }
-        )).toEqual({
-            'gs_yjxcD4dGd9yVF6ycGW6bW8gb': false,
-            'gs_x8HRCtPFT7cHFwwhMWQGWTW4': true
-        })
+        )).toEqual(new Map([
+            ['gs_yjxcD4dGd9yVF6ycGW6bW8gb', false],
+            ['gs_x8HRCtPFT7cHFwwhMWQGWTW4', true]
+        ]))
 
         expect(resolveBoardAndGetSnakeAliveStatuses({
             height: 11,
@@ -192,10 +192,10 @@ describe("Game engine", () => {
             food: [{ x: 10, y: 2 }, { x: 5, y: 5 }, { x: 3, y: 2 }],
             hazards: []
         }
-        )).toEqual({
-            'gs_yjxcD4dGd9yVF6ycGW6bW8gb': false,
-            'gs_x8HRCtPFT7cHFwwhMWQGWTW4': false
-        });
+        )).toEqual(new Map([
+            ['gs_yjxcD4dGd9yVF6ycGW6bW8gb', false],
+            ['gs_x8HRCtPFT7cHFwwhMWQGWTW4', false]
+        ]));
 
     });
 
@@ -232,10 +232,10 @@ describe("Game engine", () => {
             food: [{ x: 10, y: 2 }, { x: 5, y: 5 }, { x: 3, y: 2 }],
             hazards: []
         }
-        )).toEqual({
-            'gs_yjxcD4dGd9yVF6ycGW6bW8gb': true,
-            'gs_x8HRCtPFT7cHFwwhMWQGWTW4': false
-        });
+        )).toEqual(new Map([
+            ['gs_yjxcD4dGd9yVF6ycGW6bW8gb', true],
+            ['gs_x8HRCtPFT7cHFwwhMWQGWTW4', false]
+        ]));
 
 
         expect(resolveBoardAndGetSnakeAliveStatuses({
@@ -270,10 +270,10 @@ describe("Game engine", () => {
             food: [{ x: 10, y: 2 }, { x: 4, y: 4 }, { x: 3, y: 2 }],
             hazards: []
         }
-        )).toEqual({
-            'gs_yjxcD4dGd9yVF6ycGW6bW8gb': true,
-            'gs_x8HRCtPFT7cHFwwhMWQGWTW4': true
-        })
+        )).toEqual(new Map([
+            ['gs_yjxcD4dGd9yVF6ycGW6bW8gb', true],
+            ['gs_x8HRCtPFT7cHFwwhMWQGWTW4', true]
+        ]))
     })
 });
 
@@ -354,10 +354,10 @@ describe("Perform move on snake then assess outcome", () => {
         };
 
         moveSnake(board.snakes[0], "left");
-        expect(resolveBoardAndGetSnakeAliveStatuses(board)).toEqual({
-            'gs_yjxcD4dGd9yVF6ycGW6bW8gb': false,
-            'gs_x8HRCtPFT7cHFwwhMWQGWTW4': true
-        })
+        expect(resolveBoardAndGetSnakeAliveStatuses(board)).toEqual(new Map([
+            ['gs_yjxcD4dGd9yVF6ycGW6bW8gb', false],
+            ['gs_x8HRCtPFT7cHFwwhMWQGWTW4', true]
+        ]))
     });
 })
 
@@ -563,9 +563,9 @@ describe("Get move outcomes", () => {
                     ],
                     width: 11
                 },
-                statuses: {
-                    gs_1: true
-                }
+                statuses: new Map([
+                    ["gs_1", true]
+                ])
             },
             {
                 gameBoard: {
@@ -574,9 +574,9 @@ describe("Get move outcomes", () => {
                     ],
                     width: 11
                 },
-                statuses: {
-                    gs_1: true
-                }
+                statuses: new Map([
+                    ["gs_1", true]
+                ])
             },
             {
                 gameBoard: {
@@ -585,9 +585,9 @@ describe("Get move outcomes", () => {
                     ],
                     width: 11
                 },
-                statuses: {
-                    gs_1: true
-                }
+                statuses: new Map([
+                    ["gs_1", true]
+                ])
             }
         ];
 
@@ -624,9 +624,7 @@ describe("Get move outcomes", () => {
                     ],
                     width: 11
                 },
-                statuses: {
-                    gs_1: true
-                }
+                statuses: new Map([["gs_1", true]])
             }
         ];
 
@@ -670,10 +668,10 @@ describe("Get move outcomes", () => {
                     ],
                     width: 11
                 },
-                statuses: {
-                    gs_1: true,
-                    gs_2: true
-                }
+                statuses: new Map([
+                    ["gs_1", true],
+                    ["gs_2", true]
+                ])
             }
         ];
 
@@ -717,10 +715,10 @@ describe("Get move outcomes", () => {
                     ],
                     width: 11
                 },
-                statuses: {
-                    gs_1: true,
-                    gs_2: true
-                }
+                statuses: new Map([
+                    ["gs_1", true],
+                    ["gs_2", true]
+                ])
             },
             {
                 gameBoard: {
@@ -730,10 +728,10 @@ describe("Get move outcomes", () => {
                     ],
                     width: 11
                 },
-                statuses: {
-                    gs_1: true,
-                    gs_2: true
-                }
+                statuses: new Map([
+                    ["gs_1", true],
+                    ["gs_2", true]
+                ])
             },
         ];
 
