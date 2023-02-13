@@ -8,9 +8,7 @@ export const onPost = async (event: RequestEvent) => {
         board: GameBoard,
         you: Snake
     } = await event.request.json();
-    if (game.turn < 3) {
-        console.log(game); // gonna grab some xamples;
-    }
+
     const trimmedBoard = {
         width: game.board.width,
         height: game.board.height,
@@ -36,6 +34,9 @@ export const onPost = async (event: RequestEvent) => {
 
 
 
+
+
+
 type TrimmedBoard = {
     width: number;
     height: number;
@@ -48,7 +49,9 @@ export function getChosenMove(trimmedBoard: TrimmedBoard, mySnakeId: string) {
     const moveSurvivors = getSurvivorsByMove(outcomes, mySnakeId);
 
     //moveSurvivors is a Map(). It's a string key with [number, number] value. I want the max of all the first number of the value
+    console.log('1!!')
     const maxMySnakeAlive = Math.max(...Array.from(moveSurvivors.values()).map(tuple => tuple[1]));
+    console.log('2!!')
     const stayAliveChoices: string[] = [];
     moveSurvivors.forEach((survivors, direction) => {
         if (survivors[1] === maxMySnakeAlive) { stayAliveChoices.push(direction); }
@@ -108,9 +111,10 @@ export function getChosenMove(trimmedBoard: TrimmedBoard, mySnakeId: string) {
         });
         originalMoveScores[direction as Direction] = score;
     }
-
+    console.log('3!!')
     const maxEnemiesAlive = Math.max(...Array.from(moveSurvivors.values()).map(tuple => tuple[0]));
     for (const direction of stayAliveChoices) {
+        console.log('4!!')
         const [enemiesAlive] = moveSurvivors.get(direction)!;
         if (enemiesAlive !== maxEnemiesAlive) {
             originalMoveScores[direction as Direction]! += 2;
