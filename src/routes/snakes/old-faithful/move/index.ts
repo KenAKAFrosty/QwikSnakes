@@ -84,10 +84,7 @@ export function getChosenMove(trimmedBoard: TrimmedBoard, mySnakeId: string) {
         const newSetOfOutcomes = getMoveOutcomes(outcome.gameBoard);
         const newSurvivors = getSurvivorsByMove(newSetOfOutcomes, mySnakeId);
         const newSurvivorResponse = newSurvivors.get(outcome.originalMove);
-        if (!newSurvivorResponse) {
-            console.log('original move apparently was', outcome.originalMove)
-            return;
-        }
+        if (!newSurvivorResponse) { return; }
         const [enemiesAlive, mySnakeAlive] = newSurvivorResponse;
         originalMoveDirectionsAndSurvivors[outcome.originalMove] = originalMoveDirectionsAndSurvivors[outcome.originalMove] || [];
         originalMoveDirectionsAndSurvivors[outcome.originalMove]!.push({
