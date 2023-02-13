@@ -172,8 +172,12 @@ export function getMoveOutcomes(trimmedBoard: {
     hazards: GameBoard["hazards"];
     snakes: Array<TrimmedSnake>
 }) {
+    console.time("getReasonableDirections")
     const reasonableDirections = getReasonableDirections(trimmedBoard.snakes, trimmedBoard.width, trimmedBoard.height);
+    console.timeEnd("getReasonableDirections")
+    console.time("getMoveCommands")
     const moveCommands = getMoveCommands(reasonableDirections);
+    console.timeEnd("getMoveCommands")
 
     const outcomes: Array<{ gameBoard: typeof trimmedBoard, statuses: ReturnType<typeof resolveBoardAndGetSnakeAliveStatuses> }> = [];
 
