@@ -95,7 +95,7 @@ export function getChosenMove(trimmedBoard: TrimmedBoard, mySnakeId: string) {
             }
         });
     });
-
+    console.log('numbers dont even matter anymore')
     const originalMoveScores: { [k in Direction]?: number } = {}
     for (const direction in originalMoveDirectionsAndSurvivors) {
         const survivors = originalMoveDirectionsAndSurvivors[direction as Direction];
