@@ -44,23 +44,16 @@ type TrimmedBoard = {
     snakes: Array<TrimmedSnake>
 }
 export function getChosenMove(trimmedBoard: TrimmedBoard, mySnakeId: string) {
-    // console.time("get move outcomes")
     const outcomes = getMoveOutcomes(trimmedBoard);
-    // console.timeEnd("get move outcomes")
-
-    // console.time("get survivors by move")
     const moveSurvivors = getSurvivorsByMove(outcomes, mySnakeId);
-    // console.timeEnd("get survivors by move")
 
-    // console.time("get stay alive choices")
-    const maxMySnakeAlive = Math.max(...Object.values(moveSurvivors).map(move => move.mySnakeAlive));
+    //moveSurvivors is a Map(). It's a string key with [number, number] value. I want the max of all the first number of the value
+    const maxMySnakeAlive = Math.max(...Array.from(moveSurvivors.values()).map(tuple => tuple[1]));
     const stayAliveChoices: string[] = [];
-    for (const direction in moveSurvivors) {
-        if (moveSurvivors[direction].mySnakeAlive === maxMySnakeAlive) {
-            stayAliveChoices.push(direction);
-        }
-    }
-    // console.timeEnd("get stay alive choices")
+    moveSurvivors.forEach((survivors, direction) => {
+        if (survivors[1] === maxMySnakeAlive) { stayAliveChoices.push(direction); }
+    });
+
 
     //DOUBLE DUTY - This is filtering but we're also mutating the gameBoard to remove dead snakes
     // console.time("Filtering outcomes");
@@ -83,18 +76,21 @@ export function getChosenMove(trimmedBoard: TrimmedBoard, mySnakeId: string) {
         }>>
     } = {}
 
-    // console.time("second turn of getting move outcomes")
     stillAliveOutcomes.forEach(outcome => {
         if (!originalMoveDirectionsAndSurvivors[outcome.originalMove]) {
             originalMoveDirectionsAndSurvivors[outcome.originalMove] = [];
         }
         const newSetOfOutcomes = getMoveOutcomes(outcome.gameBoard);
         const newSurvivors = getSurvivorsByMove(newSetOfOutcomes, mySnakeId);
-        originalMoveDirectionsAndSurvivors[outcome.originalMove]!.push(newSurvivors);
+        const [enemiesAlive, mySnakeAlive] = newSurvivors.get(outcome.originalMove)!;
+        originalMoveDirectionsAndSurvivors[outcome.originalMove]!.push({
+            [outcome.originalMove]: {
+                enemiesAlive,
+                mySnakeAlive
+            }
+        });
     });
-    // console.timeEnd("second turn of getting move outcomes")
 
-    // console.time("calculating move scores")
     const originalMoveScores: { [k in Direction]?: number } = {}
     for (const direction in originalMoveDirectionsAndSurvivors) {
         const survivors = originalMoveDirectionsAndSurvivors[direction as Direction];
@@ -112,12 +108,10 @@ export function getChosenMove(trimmedBoard: TrimmedBoard, mySnakeId: string) {
         });
         originalMoveScores[direction as Direction] = score;
     }
-    // console.timeEnd("calculating move scores")
 
-    // console.time("final calculations")
-    const maxEnemiesAlive = Math.max(...Object.values(moveSurvivors).map(move => move.enemiesAlive));
+    const maxEnemiesAlive = Math.max(...Array.from(moveSurvivors.values()).map(tuple => tuple[0]));
     for (const direction of stayAliveChoices) {
-        const { enemiesAlive } = moveSurvivors[direction as Direction];
+        const [enemiesAlive] = moveSurvivors.get(direction)!;
         if (enemiesAlive !== maxEnemiesAlive) {
             originalMoveScores[direction as Direction]! += 2;
         }
@@ -126,7 +120,6 @@ export function getChosenMove(trimmedBoard: TrimmedBoard, mySnakeId: string) {
     const bestScore = Math.max(...Object.values(originalMoveScores));
     const bestMoves = Object.keys(originalMoveScores).filter(move => originalMoveScores[move as Direction] === bestScore);
     const chosenMove = bestMoves[Math.floor(Math.random() * bestMoves.length)] as Direction;
-    // console.timeEnd("final calculations")
-    // console.log({ turn: game.turn, moveSurvivors, originalMoveScores, bestMoves, stayAliveChoices })
+
     return chosenMove;
 }

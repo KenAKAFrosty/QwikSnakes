@@ -775,14 +775,12 @@ describe("Get move outcomes", () => {
         const mySnakeId = "gs_ptxF68hPjTwRtvgFmyFM3xbV";
         const outcomes = getMoveOutcomes(exampleBoard);
         const moveSurvivors = getSurvivorsByMove(outcomes, mySnakeId);
-        expect(moveSurvivors).toEqual({
-            left: { enemiesAlive: 2, mySnakeAlive: 3 },
-            right: { enemiesAlive: 3, mySnakeAlive: 3 },
-            down: { enemiesAlive: 3, mySnakeAlive: 0 },
-        });
+        expect(moveSurvivors).toEqual(new Map([
+            ["left", [2, 3]],
+            ["right", [3, 3]],
+            ["down", [3, 0]]
+        ]));
     });
-
-
 });
 
 describe("Grid from Board", () => {
