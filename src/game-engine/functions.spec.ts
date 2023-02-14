@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest"
-import { getChosenMove } from "~/routes/snakes/old-faithful/move";
 import {
     getBackwardsDirection,
+    getChosenMove,
     getMoveCommands,
     getMoveOutcomes,
     getReasonableDirections,
@@ -715,9 +715,7 @@ test("Speed", () => {
 
     for (let i = 0; i < 1; i++) {
         const start = Date.now();
-        console.time("Full run")
         const choseMove = getChosenMove(testBoard, "gs_hJbrDpT6fMm9SkCGJmt3c4qF");
-        console.timeEnd("Full run")
         const end = Date.now();
         times.push(end - start);
     }
