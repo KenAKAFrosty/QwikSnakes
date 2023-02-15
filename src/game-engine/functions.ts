@@ -308,7 +308,7 @@ export function getChosenMove(trimmedBoard: Map<keyof TrimmedBoard, any>, mySnak
         let score = 0;
         const enemiesAliveSum = survivors.reduce((sum, s) => sum + s[direction][0], 0)
         const stillAliveSum = survivors.reduce((sum, s) => sum + s[direction][1], 0)
-        score += stillAliveSum - enemiesAliveSum;
+        score += (stillAliveSum || 0) - (enemiesAliveSum || 0);
         originalMoveScores.set(direction as Direction, score);
     })
 
