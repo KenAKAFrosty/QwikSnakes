@@ -244,9 +244,10 @@ export function getSurvivorsByMove(outcomes: ReturnType<typeof getMoveOutcomes>,
         });
         const me = outcome.gameBoard.get("snakes").find((snake: TrimmedSnake) => snake.id === mySnakeId);
         if (!me) { return; }
+        const otherSnakeCount = outcome.gameBoard.get("snakes").length - 1;
         const direction = me.lastMoved;
         const currentTuple = moveSurvivors.get(direction) || [0, 0];
-        currentTuple[0] += enemiesAlive;
+        currentTuple[0] += enemiesAlive / otherSnakeCount;
         currentTuple[1] += mySnakeAlive;
         moveSurvivors.set(direction, currentTuple);
     });
@@ -305,10 +306,9 @@ export function getChosenMove(trimmedBoard: Map<keyof TrimmedBoard, any>, mySnak
     const originalMoveScores = new Map<Direction, number>();
     originalMoveDirectionsAndSurvivors.forEach((survivors, direction) => {
         let score = 0;
-        // const enemiesAliveSum = survivors.reduce((sum, s) => sum + s[direction][0], 0)
+        const enemiesAliveSum = survivors.reduce((sum, s) => sum + s[direction][0], 0)
         const stillAliveSum = survivors.reduce((sum, s) => sum + s[direction][1], 0)
-        score += stillAliveSum;
-        // enemiesAliveSum; //not using just yet, playing fully safe mode to see what happens
+        score += stillAliveSum - enemiesAliveSum;
         originalMoveScores.set(direction as Direction, score);
     })
 
