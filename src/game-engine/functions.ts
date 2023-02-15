@@ -315,6 +315,36 @@ export function getChosenMove(trimmedBoard: Map<keyof TrimmedBoard, any>, mySnak
     console.log(originalMoveScores);
     const bestScore = Math.max(...originalMoveScores.values());
     const bestMoves = Array.from(originalMoveScores.keys()).filter(move => originalMoveScores.get(move as Direction) === bestScore);
-    const chosenMove = bestMoves[Math.floor(Math.random() * bestMoves.length)] as Direction;
-    return chosenMove;
+    if (bestMoves.length === 1) {
+        return bestMoves[0] as Direction;
+    }
+
+
+    //This feels like a fever dream. It shouldn't be this crazy to find nearest food direction? But wahtever it works for now.
+    const mySnakeHead = trimmedBoard.get("snakes").find((snake: TrimmedSnake) => snake.id === mySnakeId)!.body[0] as Coordinates;
+    const nearestFoodDistancesByDirection = new Map<Direction, number>();
+    let nearestFoodDistance = 99999;
+    bestMoves.forEach(move => {
+        const coordsAfterMove = getCoordsAfterMove(mySnakeHead, move);
+        const distanceToNearestFoodAfterMove = (trimmedBoard.get("food") as Coordinates[]).map(food => getDistanceBetweenCoords(food, coordsAfterMove)).sort((a, b) => a - b)[0];
+        if (distanceToNearestFoodAfterMove < nearestFoodDistance) {
+            nearestFoodDistance = distanceToNearestFoodAfterMove;
+        }
+        nearestFoodDistancesByDirection.set(move, distanceToNearestFoodAfterMove);
+    });
+    const moveNearestToFood = Array.from(nearestFoodDistancesByDirection.keys()).filter(move => nearestFoodDistancesByDirection.get(move as Direction) === nearestFoodDistance)[0];
+    return moveNearestToFood as Direction;
+}
+
+function getCoordsAfterMove(coords: [number, number], direction: Direction): [number, number] {
+    switch (direction) {
+        case "up": return [coords[0], coords[1] + 1];
+        case "down": return [coords[0], coords[1] - 1];
+        case "left": return [coords[0] - 1, coords[1]];
+        case "right": return [coords[0] + 1, coords[1]];
+    }
+}
+
+function getDistanceBetweenCoords(coords1: [number, number], coords2: [number, number]) {
+    return Math.abs(coords1[0] - coords2[0]) + Math.abs(coords1[1] - coords2[1]);
 }
