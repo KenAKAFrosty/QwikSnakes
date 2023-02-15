@@ -23,6 +23,7 @@ export const onPost = async (event: RequestEvent) => {
         }))]
     ])
     const mySnakeId = game.you.id;
+    console.log(game.turn)
     const chosenMove = getChosenMove(trimmedBoard, mySnakeId);
     event.headers.set("Content-Type", "application/json");
     event.send(new Response(JSON.stringify({
