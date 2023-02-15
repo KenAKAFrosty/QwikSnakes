@@ -234,7 +234,6 @@ This is the simple version with just two arrays for an easy mental map of what i
 export function getSurvivorsByMove(outcomes: ReturnType<typeof getMoveOutcomes>, mySnakeId: string) {
     //tuple has [0] position for enemiesAlive, [1] position for mySnakeAlive
     const moveSurvivors = new Map<string, [number, number]>();
-
     outcomes.forEach(outcome => {
         let enemiesAlive = 0;
         let mySnakeAlive = 0;
@@ -243,7 +242,9 @@ export function getSurvivorsByMove(outcomes: ReturnType<typeof getMoveOutcomes>,
             if (id === mySnakeId) { mySnakeAlive++; }
             else { enemiesAlive++; }
         });
-        const direction = outcome.gameBoard.get("snakes").find((snake: TrimmedSnake) => snake.id === mySnakeId)!.lastMoved;
+        const me = outcome.gameBoard.get("snakes").find((snake: TrimmedSnake) => snake.id === mySnakeId);
+        if (!me) { return; }
+        const direction = me.lastMoved;
         const currentTuple = moveSurvivors.get(direction) || [0, 0];
         currentTuple[0] += enemiesAlive;
         currentTuple[1] += mySnakeAlive;
@@ -285,45 +286,32 @@ export function getChosenMove(trimmedBoard: Map<keyof TrimmedBoard, any>, mySnak
         return keepThisOne
     }) as Array<ReturnType<typeof getMoveOutcomes>[number] & { originalMove: Direction }>
 
-    const originalMoveDirectionsAndSurvivors = new Map<Direction, Array<Record<string, [number, number]>>>()
-    const round2outcomes = stillAliveOutcomes.flatMap(outcome => {
+    const originalMoveDirectionsAndSurvivors = new Map<Direction, Array<Record<string, [number, number]>>>();
+
+    stillAliveOutcomes.flatMap(outcome => {
         if (!originalMoveDirectionsAndSurvivors.has(outcome.originalMove)) {
             originalMoveDirectionsAndSurvivors.set(outcome.originalMove, []);
         }
         const round2outcomes = getMoveOutcomes(outcome.gameBoard);
         const round2survivorResponse = getSurvivorsByMove(round2outcomes, mySnakeId).get(outcome.originalMove);
-        console.log({round2survivorResponse})
-        if (!round2survivorResponse) { return; }
-        originalMoveDirectionsAndSurvivors.get(outcome.originalMove)!.push({
-            [outcome.originalMove]: round2survivorResponse
-        });
+        if (round2survivorResponse) {
+            originalMoveDirectionsAndSurvivors.get(outcome.originalMove)!.push({
+                [outcome.originalMove]: round2survivorResponse
+            });
+        }
         return round2outcomes as Array<ReturnType<typeof getMoveOutcomes>[number] & { originalMove: Direction }>
     });
-    console.log(stillAliveOutcomes.length, round2outcomes.length)
-    console.log(originalMoveDirectionsAndSurvivors)
+
     const originalMoveScores = new Map<Direction, number>();
     originalMoveDirectionsAndSurvivors.forEach((survivors, direction) => {
         let score = 0;
-        survivors!.forEach(survivor => {
-            const values = Object.values(survivor);
-            const enemiesAlive = values.map(v => v[0]);
-            const maxEnemiesAlive = Math.max(...enemiesAlive);
-            const diffsCount = enemiesAlive.filter(e => e !== maxEnemiesAlive).length;
-            score += diffsCount;
-            const mySnakeAlive = values.map(v => v[1]);
-            const stillAlives = mySnakeAlive.filter(e => e > 0).length;
-            score += stillAlives;
-        });
+        // const enemiesAliveSum = survivors.reduce((sum, s) => sum + s[direction][0], 0)
+        const stillAliveSum = survivors.reduce((sum, s) => sum + s[direction][1], 0)
+        score += stillAliveSum;
+        // enemiesAliveSum; //not using just yet, playing fully safe mode to see what happens
         originalMoveScores.set(direction as Direction, score);
     })
 
-    const maxEnemiesAlive = Math.max(...Array.from(moveSurvivors.values()).map(tuple => tuple[0]));
-    stayAliveChoices.forEach((_, direction) => {
-        const [enemiesAlive] = moveSurvivors.get(direction)!;
-        if (enemiesAlive !== maxEnemiesAlive) {
-            originalMoveScores.set(direction, originalMoveScores.get(direction)! + 2);
-        }
-    });
     console.log(originalMoveScores);
     const bestScore = Math.max(...originalMoveScores.values());
     const bestMoves = Array.from(originalMoveScores.keys()).filter(move => originalMoveScores.get(move as Direction) === bestScore);
