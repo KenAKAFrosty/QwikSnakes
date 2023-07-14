@@ -296,7 +296,20 @@ export function getChosenMove(trimmedBoard: Map<keyof TrimmedBoard, any>, mySnak
         return round2outcomes as Array<ReturnType<typeof getMoveOutcomes>[number] & { originalMove: Direction }>
     });
 
-    console.log(r2outcomes)
+
+    r2outcomes.flatMap(outcome => {
+        if (!originalMoveDirectionsAndSurvivors.has(outcome.originalMove)) {
+            originalMoveDirectionsAndSurvivors.set(outcome.originalMove, []);
+        }
+        const r3outcomes = getMoveOutcomes(outcome.gameBoard);
+        const r3survivorResponse = getSurvivorsByMove(r2outcomes, mySnakeId).get(outcome.originalMove);
+        if (r3survivorResponse) {
+            originalMoveDirectionsAndSurvivors.get(outcome.originalMove)!.push({
+                [outcome.originalMove]: r3survivorResponse
+            });
+        }
+        return r3outcomes as Array<ReturnType<typeof getMoveOutcomes>[number] & { originalMove: Direction }>
+    });
 
     const originalMoveScores = new Map<Direction, number>();
     originalMoveDirectionsAndSurvivors.forEach((survivors, direction) => {
