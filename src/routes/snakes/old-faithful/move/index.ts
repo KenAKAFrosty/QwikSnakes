@@ -9,7 +9,7 @@ export const onPost = async (event: RequestEvent) => {
         board: GameBoard,
         you: Snake
     } = await event.request.json();
-    console.log(JSON.stringify(game, null, 2));
+    console.log(JSON.stringify(game));
 
     const trimmedBoard = new Map<keyof TrimmedBoard, any>([
         ["width", game.board.width],
