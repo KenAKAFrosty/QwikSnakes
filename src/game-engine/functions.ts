@@ -294,7 +294,7 @@ export function getChosenMove(trimmedBoard: Map<keyof TrimmedBoard, any>, mySnak
             });
         }
         return round2outcomes as Array<ReturnType<typeof getMoveOutcomes>[number] & { originalMove: Direction }>
-    });
+    }).filter(item => item);
 
     
     round2.flatMap(outcome => {
