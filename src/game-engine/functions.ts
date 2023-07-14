@@ -282,7 +282,7 @@ export function getChosenMove(trimmedBoard: Map<keyof TrimmedBoard, any>, mySnak
 
     const originalMoveDirectionsAndSurvivors = new Map<Direction, Array<Record<string, [number, number]>>>();
 
-    const r2outcomes = stillAliveOutcomes.flatMap(outcome => {
+    stillAliveOutcomes.flatMap(outcome => {
         if (!originalMoveDirectionsAndSurvivors.has(outcome.originalMove)) {
             originalMoveDirectionsAndSurvivors.set(outcome.originalMove, []);
         }
