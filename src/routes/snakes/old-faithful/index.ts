@@ -7,7 +7,7 @@ export const onGet = async (event: RequestEvent) => {
         "color": "#ac7ef4",
         "head": "beluga",
         "tail": "mouse",
-        "version": "0.0.1-alpha"
+        "version": "0.0.1-beta"
     }
     event.send(new Response(JSON.stringify(config)));
 }
