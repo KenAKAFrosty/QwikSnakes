@@ -282,7 +282,7 @@ export function getChosenMove(trimmedBoard: Map<keyof TrimmedBoard, any>, mySnak
 
     const originalMoveDirectionsAndSurvivors = new Map<Direction, Array<Record<string, [number, number]>>>();
 
-    stillAliveOutcomes.flatMap(outcome => {
+    const round2 = stillAliveOutcomes.flatMap(outcome => {
         if (!originalMoveDirectionsAndSurvivors.has(outcome.originalMove)) {
             originalMoveDirectionsAndSurvivors.set(outcome.originalMove, []);
         }
@@ -297,18 +297,18 @@ export function getChosenMove(trimmedBoard: Map<keyof TrimmedBoard, any>, mySnak
     });
 
     
-    stillAliveOutcomes.flatMap(outcome => {
+    round2.flatMap(outcome => {
         if (!originalMoveDirectionsAndSurvivors.has(outcome.originalMove)) {
             originalMoveDirectionsAndSurvivors.set(outcome.originalMove, []);
         }
-        const round2outcomes = getMoveOutcomes(outcome.gameBoard);
-        const round2survivorResponse = getSurvivorsByMove(round2outcomes, mySnakeId).get(outcome.originalMove);
-        if (round2survivorResponse) {
+        const round3outcomes = getMoveOutcomes(outcome.gameBoard);
+        const round3survivorResponse = getSurvivorsByMove(round3outcomes, mySnakeId).get(outcome.originalMove);
+        if (round3survivorResponse) {
             originalMoveDirectionsAndSurvivors.get(outcome.originalMove)!.push({
-                [outcome.originalMove]: round2survivorResponse
+                [outcome.originalMove]: round3survivorResponse
             });
         }
-        return round2outcomes as Array<ReturnType<typeof getMoveOutcomes>[number] & { originalMove: Direction }>
+        return round3outcomes as Array<ReturnType<typeof getMoveOutcomes>[number] & { originalMove: Direction }>
     });
 
     const originalMoveScores = new Map<Direction, number>();
