@@ -21,7 +21,9 @@ export const onPost = async (event: RequestEvent) => {
             health: snake.health,
             squad: snake.squad
         }))]
-    ])
+    ]);
+    console.log(trimmedBoard);
+    
     event.headers.set("Content-Type", "application/json");
     event.send(200, `{"move": "${getChosenMove(trimmedBoard, game.you.id)}", "shout": "I HAVE NO MOUTH BUT I MUST SCREAM"}`);
 }
